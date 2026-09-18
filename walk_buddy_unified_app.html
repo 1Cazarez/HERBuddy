@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalkBuddy - Safe Steps & Community Pickups</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        violet: {
+                            850: '#230b38',
+                            950: '#140524',
+                        },
+                        brand: {
+                            purple: '#4A154B',
+                            violet: '#7A00FF',
+                            pink: '#FF2E93',
+                            rose: '#FF2768',
+                            light: '#F8F3FB',
+                            softPink: '#FFE5F2'
+                        }
+                    },
+                    boxShadow: {
+                        'neon': '0 0 20px rgba(255, 46, 147, 0.35)',
+                        'purple-glow': '0 0 25px rgba(122, 0, 255, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .gradient-brand {
+            background: linear-gradient(135deg, #7A00FF 0%, #E01E5A 50%, #FF2768 100%);
+        }
+
+        .pulse-pink {
+            animation: pulse-pink-ring 2s infinite;
+        }
+        @keyframes pulse-pink-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 46, 147, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(255, 46, 147, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 46, 147, 0); }
+        }
+
+        .pulse-green {
+            animation: pulse-green-ring 2s infinite;
+        }
+        @keyframes pulse-green-ring {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex justify-center items-center p-0 md:p-6 transition-colors duration-300">
+    <div class="w-full max-w-md h-screen md:h-[890px] bg-brand-light dark:bg-violet-950 md:rounded-[44px] shadow-2xl overflow-hidden flex flex-col relative border-0 md:border-[10px] border-slate-950 transition-colors duration-300">
+        <div class="px-6 pt-3 pb-2 flex justify-between items-center text-xs font-semibold text-slate-500 dark:text-slate-400 select-none z-30 bg-brand-light/90 dark:bg-violet-950/90 backdrop-blur-md">
+            <span class="font-bold tracking-tight text-brand-purple dark:text-brand-pink">WalkBuddy</span>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] bg-brand-pink/10 text-brand-pink dark:bg-brand-pink/20 px-2 py-0.5 rounded-full font-bold">LIVE</span>
+                <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                <i data-lucide="battery" class="w-4 h-4"></i>
+                <button onclick="toggleDarkMode()" class="p-1 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                    <i data-lucide="moon" id="icon-dark" class="w-3.5 h-3.5 hidden"></i>
+                    <i data-lucide="sun" id="icon-light" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="toast" class="absolute top-12 left-4 right-4 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+            <div class="gradient-brand text-white px-4 py-3 rounded-2xl shadow-neon flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-white/20 rounded-xl">
+                        <i data-lucide="bell" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold" id="toast-title">Notification</p>
+                        <p class="text-[11px] text-white/90" id="toast-message">Action processed successfully!</p>
+                    </div>
+                </div>
+                <button onclick="hideToast()" class="text-white/80 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+        </div>
+
+        <div id="active-walk-banner" class="hidden z-20 px-4 pt-1 pb-2">
+            <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white p-3.5 rounded-2xl shadow-lg border border-emerald-400/30 flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 pulse-green"></span>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-100">🟢 WALK IN PROGRESS</span>
+                    </div>
+                    <span id="walk-timer" class="text-xs font-mono font-bold bg-black/20 px-2 py-0.5 rounded-md">23:14</span>
+                </div>
+
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h4 id="active-walk-route-name" class="text-xs font-extrabold text-white">Student Center → Library</h4>
+                        <p class="text-[10px] text-emerald-100"><span id="active-walk-distance">1.2 miles</span> • <span id="active-walk-buddies">2 buddies walking along</span></p>
+                    </div>
+                    <div class="flex gap-1.5">
+                        <button onclick="triggerArrivalCheckIn()" class="bg-white text-emerald-800 text-[11px] font-extrabold px-3 py-1.5 rounded-xl shadow-sm hover:bg-emerald-50 transition active:scale-95 flex items-center gap-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> I'VE ARRIVED
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar relative px-4 pb-24 pt-2">
+            <section id="tab-home" class="tab-content active space-y-4">
+                <div class="flex justify-between items-center pt-1">
+                    <div>
+                        <div class="flex items-center gap-1.5 text-brand-pink font-bold text-xs">
+                            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                            <span>Campus Safety & Walk Network</span>
+                        </div>
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Hey, Maya! 👋</h1>
+                    </div>
+                    <div class="relative cursor-pointer" onclick="switchTab('profile')">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" class="w-11 h-11 rounded-2xl object-cover ring-2 ring-brand-pink/50 shadow-md">
+                        <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-violet-950 rounded-full"></span>
+                    </div>
+                </div>
+
+                <div class="gradient-brand text-white p-5 rounded-3xl shadow-neon relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                            <i data-lucide="users" class="w-3 h-3 text-pink-200"></i> Route Match Found
+                        </span>
+                        <span class="text-xs bg-black/20 px-2.5 py-0.5 rounded-full font-semibold">3:30 PM Today</span>
+                    </div>
+                    <h3 class="text-lg font-black leading-tight">Student Center → Library</h3>
+                    <p class="text-xs text-white/80 mt-1">3 people are already walking this exact route right now!</p>
+                    <div class="mt-4 pt-3 border-t border-white/20 flex items-center justify-between">
+                        <div class="flex -space-x-2">
+                            <img class="w-7 h-7 rounded-full border-2 border-brand-pink object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100">
+                            <img class="w-7 h-7 rounded-full border-2 border-brand-pink object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100">
+                            <img class="w-7 h-7 rounded-full border-2 border-brand-pink object-cover" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100">
+                            <div class="w-7 h-7 rounded-full bg-white/20 border-2 border-brand-pink flex items-center justify-center text-[9px] font-bold">+3</div>
+                        </div>
+                        <button onclick="quickJoinSuggestedRoute()" class="bg-white text-brand-purple hover:bg-brand-softPink font-extrabold text-xs px-4 py-2 rounded-xl shadow-md transition active:scale-95 flex items-center gap-1">
+                            Join Walk <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-violet-900/60 p-4 rounded-3xl border border-brand-pink/20 shadow-sm relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="p-2 bg-brand-pink/10 text-brand-pink rounded-xl">
+                                <i data-lucide="package-check" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase text-brand-pink tracking-wider">📦 SMART PICKUP</span>
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white">Library Book Return Request</h4>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 dark:text-emerald-300 px-2 py-0.5 rounded-lg">On Your Path</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-300 mb-3">Someone needs a book dropped off at the Library at 3:30 PM. Earn +50 Wellness points!</p>
+                    <button onclick="acceptErrandRequest(1)" class="w-full bg-gradient-to-r from-brand-violet to-brand-pink text-white font-bold text-xs py-2.5 rounded-xl shadow-md hover:opacity-95 transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="package-plus" class="w-4 h-4"></i> ACCEPT PICKUP
+                    </button>
+                </div>
+
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Wellness & Goals</h3>
+                        <span class="text-xs font-bold text-brand-pink cursor-pointer" onclick="switchTab('profile')">Full Dashboard</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="bg-brand-light dark:bg-violet-950/60 p-3 rounded-2xl border border-brand-pink/10">
+                            <i data-lucide="footprints" class="w-4 h-4 text-brand-pink mx-auto mb-1"></i>
+                            <span class="block text-lg font-black text-slate-900 dark:text-white" id="home-step-count">6,420</span>
+                            <span class="text-[10px] text-slate-400">/ 8,000 steps</span>
+                        </div>
+                        <div class="bg-brand-light dark:bg-violet-950/60 p-3 rounded-2xl border border-brand-pink/10">
+                            <i data-lucide="timer" class="w-4 h-4 text-brand-violet mx-auto mb-1"></i>
+                            <span class="block text-lg font-black text-slate-900 dark:text-white" id="home-mins-count">38</span>
+                            <span class="text-[10px] text-slate-400">Active Mins</span>
+                        </div>
+                        <div class="bg-brand-light dark:bg-violet-950/60 p-3 rounded-2xl border border-brand-pink/10">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 mx-auto mb-1"></i>
+                            <span class="block text-lg font-black text-slate-900 dark:text-white">100%</span>
+                            <span class="text-[10px] text-slate-400">Safety Score</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Health Her • Safety Network</h3>
+                        <span class="text-[10px] text-emerald-500 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> 2 Contacts Active</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-2">
+                            <div class="flex -space-x-2">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" class="w-8 h-8 rounded-full border-2 border-white dark:border-violet-900 object-cover">
+                                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=100" class="w-8 h-8 rounded-full border-2 border-white dark:border-violet-900 object-cover">
+                            </div>
+                            <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Mom & Campus Security</span>
+                        </div>
+                        <button onclick="triggerEmergencyCheckInTest()" class="text-[11px] bg-rose-100 dark:bg-rose-950/80 text-rose-600 dark:text-rose-300 font-bold px-3 py-1.5 rounded-xl hover:bg-rose-200 transition">
+                            Test Safety Ping
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-find" class="tab-content space-y-4">
+                <div class="pt-1 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white">Find a Walk</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Join verified buddy groups & safe routes</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-brand-pink/10 text-brand-pink rounded-xl text-xs font-bold" id="routes-count-badge">3 Available</span>
+                </div>
+                <div class="relative">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400"></i>
+                    <input type="text" id="find-search-input" onkeyup="renderWalkList()" placeholder="Search routes (e.g., Library, Quad)..." class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800/60 pl-10 pr-4 py-2.5 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-pink">
+                </div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
+                    <button onclick="setFilter('all')" class="filter-btn active bg-gradient-to-r from-brand-violet to-brand-pink text-white px-3.5 py-1.5 rounded-full font-bold whitespace-nowrap">All Walks</button>
+                    <button onclick="setFilter('popular')" class="filter-btn bg-white dark:bg-violet-900/60 text-slate-600 dark:text-slate-300 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">🔥 High Buddy Match</button>
+                    <button onclick="setFilter('night')" class="filter-btn bg-white dark:bg-violet-900/60 text-slate-600 dark:text-slate-300 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">🌙 Safe Night Route</button>
+                </div>
+                <div id="walks-container" class="space-y-3"></div>
+            </section>
+
+            <section id="tab-create" class="tab-content space-y-4">
+                <div class="pt-1">
+                    <div class="flex items-center gap-1.5 text-brand-pink font-bold text-xs">
+                        <i data-lucide="shield-heart" class="w-4 h-4"></i>
+                        <span>Health Her Safety Scheduler</span>
+                    </div>
+                    <h1 class="text-2xl font-black text-slate-900 dark:text-white">Create a Safe Walk</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Schedule a group walk or ask for walking buddies</p>
+                </div>
+
+                <form id="create-walk-form" onsubmit="handleCreateWalk(event)" class="space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Route & Name</label>
+                        <input type="text" id="input-route-title" required placeholder="e.g. Student Center to Library" oninput="checkRouteMatches()" class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800 px-3.5 py-2.5 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-pink">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">From</label>
+                            <input type="text" id="input-origin" required value="Student Center" class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">To</label>
+                            <input type="text" id="input-destination" required value="Library" class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                        </div>
+                    </div>
+                    <div id="route-match-alert" class="bg-gradient-to-r from-purple-900/40 to-pink-900/40 p-3 rounded-2xl border border-brand-pink/40 text-xs flex items-center gap-2.5">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-brand-pink flex-shrink-0"></i>
+                        <div>
+                            <span class="font-extrabold text-brand-pink block">3 walkers already on this route!</span>
+                            <span class="text-[10px] text-slate-300">Scheduling will automatically pair you for maximum safety.</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Schedule Time</label>
+                            <input type="time" id="input-time" value="15:30" required class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Est. Distance</label>
+                            <select id="input-distance" class="w-full bg-white dark:bg-violet-900/60 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                                <option value="0.8">0.8 miles (15 min)</option>
+                                <option value="1.2" selected>1.2 miles (23 min)</option>
+                                <option value="2.0">2.0 miles (35 min)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-violet-900/40 p-3.5 rounded-2xl border border-slate-100 dark:border-violet-800/50 space-y-2.5">
+                        <span class="text-xs font-bold text-brand-pink flex items-center gap-1">
+                            <i data-lucide="shield" class="w-3.5 h-3.5"></i> Vy's Safety Check-in Controls
+                        </span>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300">Auto Safety Ping if delayed</span>
+                            <input type="checkbox" checked class="accent-brand-pink rounded">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-slate-600 dark:text-slate-300">Notify Trusted Contacts on Start</span>
+                            <input type="checkbox" checked class="accent-brand-pink rounded">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full gradient-brand text-white font-black text-xs py-3.5 rounded-2xl shadow-neon hover:opacity-95 transition active:scale-95 flex items-center justify-center gap-2">
+                        <i data-lucide="navigation" class="w-4 h-4"></i> START / SCHEDULE WALK NOW
+                    </button>
+                </form>
+            </section>
+
+            <section id="tab-pickup" class="tab-content space-y-4">
+                <div class="pt-1 flex justify-between items-center">
+                    <div>
+                        <div class="flex items-center gap-1.5 text-brand-pink font-bold text-xs">
+                            <i data-lucide="package" class="w-4 h-4"></i>
+                            <span>Juan's Community Errand System</span>
+                        </div>
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white">Smart Pickups</h1>
+                    </div>
+                    <button onclick="openNewErrandModal()" class="bg-brand-pink/10 text-brand-pink text-xs font-extrabold px-3 py-1.5 rounded-xl border border-brand-pink/20 hover:bg-brand-pink/20 transition">
+                        + Request Errand
+                    </button>
+                </div>
+                <div class="bg-gradient-to-br from-violet-900 to-brand-purple text-white p-4 rounded-3xl shadow-lg border border-brand-pink/30">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] uppercase font-extrabold text-brand-pink tracking-wider">Errands En Route</span>
+                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full" id="errand-tracker-status">In Transit</span>
+                    </div>
+                    <h3 class="text-xs font-bold" id="active-errand-title">Library Book Dropoff</h3>
+                    <p class="text-[11px] text-white/70 mb-3">Carrier: Maya (Student Center → Library)</p>
+                    <div class="grid grid-cols-4 gap-1 text-center text-[9px] font-bold text-white/60">
+                        <div class="step-item text-brand-pink"><div class="h-1.5 bg-brand-pink rounded-full mb-1"></div><span>Requested</span></div>
+                        <div class="step-item text-brand-pink"><div class="h-1.5 bg-brand-pink rounded-full mb-1"></div><span>Matched</span></div>
+                        <div id="step-transit" class="step-item text-brand-pink"><div class="h-1.5 bg-brand-pink rounded-full mb-1"></div><span>In Transit</span></div>
+                        <div id="step-delivered" class="step-item"><div class="h-1.5 bg-white/20 rounded-full mb-1"></div><span>Delivered</span></div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <h3 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Nearby Errand Opportunities</h3>
+                    <div id="errands-list" class="space-y-3"></div>
+                </div>
+            </section>
+
+            <section id="tab-profile" class="tab-content space-y-4">
+                <div class="pt-1 flex justify-between items-center">
+                    <h1 class="text-2xl font-black text-slate-900 dark:text-white">Wellness & Profile</h1>
+                    <span class="text-xs bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-bold px-2.5 py-1 rounded-xl">Verified Student</span>
+                </div>
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 flex items-center gap-3.5 shadow-sm">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-brand-pink">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Maya Lin</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Junior • Campus Walking Buddy</p>
+                        <div class="flex items-center gap-2 mt-1 text-[11px] font-semibold text-brand-pink">
+                            <i data-lucide="award" class="w-3.5 h-3.5"></i> Level 4 Safety Champion
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 space-y-3 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Esther's Wellness Goals</h3>
+                        <span class="text-xs font-bold text-emerald-500">62% Weekly Goal</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-slate-700 dark:text-slate-200">Daily Steps</span>
+                            <span class="text-brand-pink" id="profile-step-val">6,420 / 10,000</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-violet-950 h-3 rounded-full overflow-hidden p-0.5">
+                            <div id="step-progress-bar" class="gradient-brand h-full rounded-full transition-all duration-500" style="width: 64%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 pt-1 text-center">
+                        <div class="p-3 bg-brand-light dark:bg-violet-950/60 rounded-2xl border border-brand-pink/10">
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Weekly Distance</span>
+                            <span class="text-base font-black text-slate-900 dark:text-white" id="weekly-dist">14.8 mi</span>
+                        </div>
+                        <div class="p-3 bg-brand-light dark:bg-violet-950/60 rounded-2xl border border-brand-pink/10">
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Errands Completed</span>
+                            <span class="text-base font-black text-slate-900 dark:text-white" id="completed-errands-count">9</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 space-y-3 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Vy's Safety Contacts</h3>
+                        <button onclick="addTrustedContact()" class="text-xs text-brand-pink font-bold">+ Add</button>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center p-2.5 bg-brand-light dark:bg-violet-950/60 rounded-xl">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <span class="font-bold text-slate-800 dark:text-slate-200">Sarah Lin (Mom)</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">Primary SOS</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2.5 bg-brand-light dark:bg-violet-950/60 rounded-xl">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                <span class="font-bold text-slate-800 dark:text-slate-200">Campus Escort Dispatch</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">24/7 Security</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="absolute bottom-0 left-0 right-0 bg-white/95 dark:bg-violet-950/95 backdrop-blur-md border-t border-slate-200/80 dark:border-violet-800/50 px-4 py-2.5 flex justify-around items-center z-30">
+            <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 text-brand-pink transition">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="text-[10px] font-extrabold">Home</span>
+            </button>
+            <button onclick="switchTab('find')" id="nav-find" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-brand-pink transition">
+                <i data-lucide="compass" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold">Find</span>
+            </button>
+            <button onclick="switchTab('create')" id="nav-create" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
+                <div class="gradient-brand text-white p-2.5 rounded-full -mt-6 shadow-neon hover:scale-105 transition">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 mt-0.5">Walk</span>
+            </button>
+            <button onclick="switchTab('pickup')" id="nav-pickup" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-brand-pink transition">
+                <i data-lucide="package" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold">Errands</span>
+            </button>
+            <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-brand-pink transition">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold">Wellness</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="errand-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white dark:bg-violet-900 rounded-3xl max-w-xs w-full p-5 space-y-4 shadow-2xl border border-brand-pink/30">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <i data-lucide="package-plus" class="w-4 h-4 text-brand-pink"></i> Request Community Errand
+                </h3>
+                <button onclick="closeNewErrandModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Item Description</label>
+                <input type="text" id="modal-errand-item" placeholder="e.g. Return Library Book" class="w-full bg-slate-50 dark:bg-violet-950 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Pickup At</label>
+                    <input type="text" id="modal-errand-from" value="Student Center" class="w-full bg-slate-50 dark:bg-violet-950 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Dropoff At</label>
+                    <input type="text" id="modal-errand-to" value="Library" class="w-full bg-slate-50 dark:bg-violet-950 border border-slate-200 dark:border-violet-800 px-3 py-2 rounded-xl text-xs">
+                </div>
+            </div>
+            <div class="pt-2 flex gap-2">
+                <button onclick="closeNewErrandModal()" class="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-violet-950 text-xs font-bold text-slate-600 dark:text-slate-300">Cancel</button>
+                <button onclick="submitNewErrand()" class="flex-1 py-2.5 rounded-xl gradient-brand text-xs font-bold text-white shadow-md">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const appState = {
+            user: {
+                name: "Maya Lin",
+                steps: 6420,
+                activeMinutes: 38,
+                weeklyDistance: 14.8,
+                completedErrands: 9
+            },
+            activeWalk: null,
+            timerInterval: null,
+            secondsElapsed: 1394,
+            walks: [
+                {
+                    id: 1,
+                    title: "Student Center → Library",
+                    from: "Student Center",
+                    to: "Library",
+                    time: "3:30 PM",
+                    distance: "1.2 mi",
+                    buddies: 3,
+                    difficulty: "Easy",
+                    nightSafe: true,
+                    joined: false,
+                    avatars: [
+                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100",
+                        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100",
+                        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100"
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "North Campus Quad Loop",
+                    from: "Quad Plaza",
+                    to: "Science Hall",
+                    time: "4:15 PM",
+                    distance: "0.8 mi",
+                    buddies: 2,
+                    difficulty: "Easy",
+                    nightSafe: true,
+                    joined: false,
+                    avatars: [
+                        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100",
+                        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=100"
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "West Dorm Stroll",
+                    from: "West Housing",
+                    to: "Dining Hall",
+                    time: "5:00 PM",
+                    distance: "1.5 mi",
+                    buddies: 5,
+                    difficulty: "Moderate",
+                    nightSafe: false,
+                    joined: false,
+                    avatars: [
+                        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"
+                    ]
+                }
+            ],
+            errands: [
+                {
+                    id: 1,
+                    title: "Library Book Return",
+                    from: "Student Center",
+                    to: "Library",
+                    requester: "Chloe T.",
+                    reward: "+50 pts",
+                    status: "Pending"
+                },
+                {
+                    id: 2,
+                    title: "Grab Iced Coffee from Cafe",
+                    from: "Student Center",
+                    to: "Science Hall",
+                    requester: "Liam K.",
+                    reward: "+40 pts",
+                    status: "Pending"
+                }
+            ],
+            activeFilter: 'all'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderWalkList();
+            renderErrandList();
+            updateWellnessUI();
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-brand-pink transition';
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = 'nav-btn flex flex-col items-center gap-1 text-brand-pink font-extrabold transition';
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('icon-dark').classList.toggle('hidden', !isDark);
+            document.getElementById('icon-light').classList.toggle('hidden', isDark);
+        }
+
+        function renderWalkList() {
+            const container = document.getElementById('walks-container');
+            const query = document.getElementById('find-search-input')?.value.toLowerCase() || '';
+            const filtered = appState.walks.filter(w => {
+                const matchesSearch = w.title.toLowerCase().includes(query) || w.from.toLowerCase().includes(query) || w.to.toLowerCase().includes(query);
+                if (appState.activeFilter === 'night') return matchesSearch && w.nightSafe;
+                if (appState.activeFilter === 'popular') return matchesSearch && w.buddies >= 3;
+                return matchesSearch;
+            });
+            document.getElementById('routes-count-badge').innerText = `${filtered.length} Available`;
+
+            container.innerHTML = filtered.map(w => `
+                <div class="bg-white dark:bg-violet-900/40 p-4 rounded-3xl border border-slate-100 dark:border-violet-800/50 shadow-sm space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-extrabold text-brand-pink bg-brand-pink/10 px-2 py-0.5 rounded-md">
+                                ${w.nightSafe ? '🌙 Safe Night Route' : '☀️ Day Route'}
+                            </span>
+                            <h3 class="text-sm font-black text-slate-900 dark:text-white mt-1.5">${w.title}</h3>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400">${w.time}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-300">
+                        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-pink"></i> ${w.from} → ${w.to}</span>
+                        <span class="font-bold">${w.distance}</span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 dark:border-violet-800/40 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="flex -space-x-2">
+                                ${w.avatars.map(a => `<img src="${a}" class="w-6 h-6 rounded-full border-2 border-white dark:border-violet-900 object-cover">`).join('')}
+                            </div>
+                            <span class="text-[11px] font-bold text-slate-600 dark:text-slate-300">${w.buddies} buddies walking</span>
+                        </div>
+                        <button onclick="joinWalkFromList(${w.id})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${w.joined ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'gradient-brand text-white shadow-md'}">
+                            ${w.joined ? 'Joined ✓' : 'Join Group'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function setFilter(filterType) {
+            appState.activeFilter = filterType;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn bg-white dark:bg-violet-900/60 text-slate-600 dark:text-slate-300 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap";
+            });
+            event.target.className = "filter-btn active bg-gradient-to-r from-brand-violet to-brand-pink text-white px-3.5 py-1.5 rounded-full font-bold whitespace-nowrap";
+            renderWalkList();
+        }
+
+        function renderErrandList() {
+            const container = document.getElementById('errands-list');
+            container.innerHTML = appState.errands.map(e => `
+                <div class="bg-white dark:bg-violet-900/40 p-3.5 rounded-2xl border border-slate-100 dark:border-violet-800/50 flex items-center justify-between shadow-sm">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-900 dark:text-white">${e.title}</span>
+                            <span class="text-[9px] bg-brand-pink/10 text-brand-pink font-bold px-1.5 py-0.5 rounded">${e.reward}</span>
+                        </div>
+                        <p class="text-[10px] text-slate-400">Path: ${e.from} → ${e.to} • Requested by ${e.requester}</p>
+                    </div>
+                    <button onclick="acceptErrandRequest(${e.id})" class="text-xs font-extrabold text-white gradient-brand px-3 py-1.5 rounded-xl shadow-sm hover:opacity-90 transition">
+                        Accept
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function handleCreateWalk(e) {
+            e.preventDefault();
+            const title = document.getElementById('input-route-title').value;
+            const from = document.getElementById('input-origin').value;
+            const to = document.getElementById('input-destination').value;
+            const distance = document.getElementById('input-distance').value;
+
+            appState.activeWalk = {
+                title,
+                from,
+                to,
+                distance: `${distance} miles`,
+                buddies: 3
+            };
+
+            showActiveWalkBanner();
+            showToast("🟢 Walk Started!", `Walk safely to ${to}. Safety check-in active.`);
+            switchTab('home');
+        }
+
+        function quickJoinSuggestedRoute() {
+            appState.activeWalk = {
+                title: "Student Center → Library",
+                from: "Student Center",
+                to: "Library",
+                distance: "1.2 miles",
+                buddies: 3
+            };
+            showActiveWalkBanner();
+            showToast("Joined Group Walk!", "3 buddies notified. Safety check-in initiated.");
+        }
+
+        function showActiveWalkBanner() {
+            const banner = document.getElementById('active-walk-banner');
+            banner.classList.remove('hidden');
+            document.getElementById('active-walk-route-name').innerText = appState.activeWalk.title;
+            document.getElementById('active-walk-distance').innerText = appState.activeWalk.distance;
+
+            if (!appState.timerInterval) {
+                appState.timerInterval = setInterval(() => {
+                    appState.secondsElapsed++;
+                    const mins = Math.floor(appState.secondsElapsed / 60);
+                    const secs = appState.secondsElapsed % 60;
+                    document.getElementById('walk-timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+        }
+
+        function triggerArrivalCheckIn() {
+            clearInterval(appState.timerInterval);
+            appState.timerInterval = null;
+            document.getElementById('active-walk-banner').classList.add('hidden');
+
+            appState.user.steps += 2400;
+            appState.user.activeMinutes += 23;
+            appState.user.weeklyDistance = (parseFloat(appState.user.weeklyDistance) + 1.2).toFixed(1);
+
+            updateWellnessUI();
+            showToast("🎉 Safe Arrival Confirmed!", "Trusted contacts notified & +2,400 steps added to Wellness!");
+        }
+
+        function updateWellnessUI() {
+            document.getElementById('home-step-count').innerText = appState.user.steps.toLocaleString();
+            document.getElementById('home-mins-count').innerText = appState.user.activeMinutes;
+            document.getElementById('profile-step-val').innerText = `${appState.user.steps.toLocaleString()} / 10,000`;
+            document.getElementById('weekly-dist').innerText = `${appState.user.weeklyDistance} mi`;
+            document.getElementById('completed-errands-count').innerText = appState.user.completedErrands;
+
+            const pct = Math.min(100, Math.round((appState.user.steps / 10000) * 100));
+            document.getElementById('step-progress-bar').style.width = `${pct}%`;
+        }
+
+        function acceptErrandRequest(id) {
+            appState.user.completedErrands++;
+            updateWellnessUI();
+
+            const transitStep = document.getElementById('step-transit');
+            if (transitStep) {
+                transitStep.className = 'step-item text-brand-pink font-bold';
+            }
+            document.getElementById('errand-tracker-status').innerText = 'In Transit';
+
+            showToast("📦 Pickup Accepted!", "Item attached to active walk. Carrier route updated.");
+            switchTab('pickup');
+        }
+
+        function openNewErrandModal() {
+            const modal = document.getElementById('errand-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeNewErrandModal() {
+            const modal = document.getElementById('errand-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function submitNewErrand() {
+            const item = document.getElementById('modal-errand-item').value || 'Package Dropoff';
+            const from = document.getElementById('modal-errand-from').value;
+            const to = document.getElementById('modal-errand-to').value;
+
+            appState.errands.unshift({
+                id: Date.now(),
+                title: item,
+                from,
+                to,
+                requester: "You",
+                reward: "+50 pts",
+                status: "Pending"
+            });
+
+            renderErrandList();
+            closeNewErrandModal();
+            showToast("Errand Request Live!", "Walkers along this path will be notified.");
+        }
+
+        function joinWalkFromList(id) {
+            const walk = appState.walks.find(w => w.id === id);
+            if (walk) {
+                walk.joined = !walk.joined;
+                if (walk.joined) walk.buddies++;
+                else walk.buddies--;
+                renderWalkList();
+                showToast(walk.joined ? "Group Joined!" : "Left Group", `${walk.title}`);
+            }
+        }
+
+        function checkRouteMatches() {
+            const title = document.getElementById('input-route-title').value.toLowerCase();
+            const alertBox = document.getElementById('route-match-alert');
+            if (title.includes('library') || title.includes('student center')) {
+                alertBox.classList.remove('hidden');
+            }
+        }
+
+        function triggerEmergencyCheckInTest() {
+            showToast("🛡️ Safety Ping Sent", "Mom & Campus Escort Dispatch received safe test location.");
+        }
+
+        function addTrustedContact() {
+            showToast("Add Contact", "Enter mobile number to send Health Her safety invite.");
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = msg;
+
+            toast.classList.remove('-translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                hideToast();
+            }, 3500);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('-translate-y-24', 'opacity-0');
+        }
+    </script>
+</body>
+</html>
