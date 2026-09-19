@@ -1,0 +1,188 @@
+/* Theme palettes. Each defines the same named slots as RGB triplets (for
+   Tailwind's `rgb(var(--x) / <alpha>)` color pattern) so every existing
+   text-neonPink / bg-deepIndigo / shadow-neon-pink utility class across the
+   app automatically repaints — no component markup needs to change.
+   Semantic colors (safety green, alert red — Tailwind's built-in emerald/
+   rose/sky palettes used directly in markup) are intentionally NOT themed
+   here, since they carry meaning independent of brand styling. */
+:root,
+[data-theme="classic"] {
+    --color-deepIndigo: 16 0 43;
+    --color-darkPurple: 36 0 70;
+    --color-electricPurple: 123 44 191;
+    --color-deepViolet: 58 12 163;
+    --color-radiantPink: 224 30 90;
+    --color-neonPink: 255 46 147;
+    --color-softPinkBg: 255 229 241;
+    --bg-app: 8 0 24;
+}
+
+[data-theme="teal"] {
+    --color-deepIndigo: 0 27 46;
+    --color-darkPurple: 1 42 74;
+    --color-electricPurple: 1 58 99;
+    --color-deepViolet: 1 73 124;
+    --color-radiantPink: 8 145 178;
+    --color-neonPink: 34 211 238;
+    --color-softPinkBg: 207 250 254;
+    --bg-app: 0 13 23;
+}
+
+[data-theme="coral"] {
+    --color-deepIndigo: 43 10 18;
+    --color-darkPurple: 61 18 32;
+    --color-electricPurple: 194 65 12;
+    --color-deepViolet: 154 52 18;
+    --color-radiantPink: 220 38 38;
+    --color-neonPink: 249 115 22;
+    --color-softPinkBg: 255 237 213;
+    --bg-app: 26 5 8;
+}
+
+[data-theme="emerald"] {
+    --color-deepIndigo: 3 27 20;
+    --color-darkPurple: 4 41 29;
+    --color-electricPurple: 6 95 70;
+    --color-deepViolet: 4 120 87;
+    --color-radiantPink: 16 185 129;
+    --color-neonPink: 52 211 153;
+    --color-softPinkBg: 209 250 229;
+    --bg-app: 1 16 9;
+}
+
+[data-theme="ocean"] {
+    --color-deepIndigo: 2 6 23;
+    --color-darkPurple: 15 23 42;
+    --color-electricPurple: 29 78 216;
+    --color-deepViolet: 30 64 175;
+    --color-radiantPink: 37 99 235;
+    --color-neonPink: 56 189 248;
+    --color-softPinkBg: 219 234 254;
+    --bg-app: 1 2 8;
+}
+
+[data-theme="bright"] {
+    --color-deepIndigo: 245 240 255;
+    --color-darkPurple: 237 228 255;
+    --color-electricPurple: 123 44 191;
+    --color-deepViolet: 91 42 134;
+    --color-radiantPink: 219 39 119;
+    --color-neonPink: 255 46 147;
+    --color-softPinkBg: 255 229 241;
+    --bg-app: 248 245 255;
+    --text-app: rgb(42 15 74);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: rgb(var(--bg-app));
+    color: var(--text-app, #f8fafc);
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ported from the team's monolithic-HTML "Bright Mode" toggle: our brand
+   palette above is designed dark-first, so a light theme also needs these
+   overrides for the plain (non-variable) Tailwind utility classes used
+   throughout the markup — text-white, bg-black/NN, border-white/NN, etc. */
+[data-theme="bright"] .gradient-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(241,231,255,0.92) 100%);
+    border-color: rgba(123,44,191,0.25);
+}
+[data-theme="bright"] [class*="text-slate-"] {
+    color: #5b2a86;
+}
+[data-theme="bright"] [class*="bg-black/"] {
+    background-color: rgba(124,58,199,0.08);
+}
+[data-theme="bright"] [class*="border-white/"] {
+    border-color: rgba(123,44,191,0.2);
+}
+[data-theme="bright"] [class*="text-white"]:not(.gradient-brand):not(.gradient-brand *) {
+    color: #2a0f4a;
+}
+[data-theme="bright"] .phone-home-screen {
+    background: linear-gradient(135deg, #fdf2ff 0%, #f3e8ff 50%, #ede4ff 100%);
+}
+
+/* Our hb-* elements are purely structural (each renders one block-level
+   section/component into the light DOM) but undefined/custom elements
+   default to `display: inline`. Left as inline, a block-level child inside
+   an inline wrapper can produce inconsistent hit-testing (clicks landing on
+   the wrapper instead of the actual control). `display: contents` removes
+   the wrapper from layout entirely so only its children participate. */
+hb-toast, hb-device-header, hb-active-walk-banner, hb-login-screen,
+hb-tab-home, hb-tab-match, hb-tab-find, hb-tab-wellness, hb-tab-chat, hb-tab-create,
+hb-tab-pickup, hb-tab-profile, hb-nav-bar, hb-edit-profile-modal, hb-errand-modal,
+hb-mutual-match-modal, hb-fake-call-modal, hb-report-modal {
+    display: contents;
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.tab-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+.tab-content.active {
+    display: block;
+    opacity: 1;
+}
+
+.gradient-brand {
+    background: linear-gradient(135deg,
+        rgb(var(--color-electricPurple)) 0%,
+        rgb(var(--color-deepViolet)) 40%,
+        rgb(var(--color-radiantPink)) 75%,
+        rgb(var(--color-neonPink)) 100%);
+    transition: background 0.3s ease;
+}
+
+.gradient-card {
+    background: linear-gradient(145deg,
+        rgb(var(--color-darkPurple) / 0.85) 0%,
+        rgb(var(--color-deepIndigo) / 0.95) 100%);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgb(var(--color-neonPink) / 0.25);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.animal-avatar-box {
+    background: linear-gradient(135deg,
+        rgb(var(--color-electricPurple) / 0.3) 0%,
+        rgb(var(--color-neonPink) / 0.3) 100%);
+    border: 1.5px solid rgb(var(--color-neonPink) / 0.5);
+    transition: all 0.2s ease;
+}
+
+.pulse-pink {
+    animation: pulse-pink-ring 2s infinite;
+}
+@keyframes pulse-pink-ring {
+    0% { box-shadow: 0 0 0 0 rgb(var(--color-neonPink) / 0.7); }
+    70% { box-shadow: 0 0 0 12px rgb(var(--color-neonPink) / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(var(--color-neonPink) / 0); }
+}
+
+.pulse-emerald {
+    animation: pulse-emerald-ring 2s infinite;
+}
+@keyframes pulse-emerald-ring {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.theme-swatch {
+    transition: transform 0.15s ease, outline-color 0.15s ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+.theme-swatch:hover {
+    transform: scale(1.08);
+}
+.theme-swatch-active {
+    outline-color: #fff;
+}
+

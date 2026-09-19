@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Herbuddy - Campus Safety, Wellness & Pickups</title>
+
+    <script>
+        // Applied before first paint so switching themes doesn't flash the
+        // default (classic) palette on reload.
+        (function () {
+            try {
+                var saved = localStorage.getItem('herbuddy-theme');
+                if (saved) document.documentElement.setAttribute('data-theme', saved);
+            } catch (err) { /* localStorage unavailable (private mode, etc.) */ }
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Maps is loaded dynamically by js/map.js, which fetches the
+         API key from the backend (server/routes/config.js) instead of it
+         being hardcoded here. -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+
+    <script>
+        // Colors resolve through CSS variables (see css/styles.css) so a
+        // theme switch just changes those variables' values at runtime —
+        // no need to regenerate or swap any Tailwind utility classes.
+        function withOpacity(variable) {
+            return ({ opacityValue }) => opacityValue === undefined
+                ? `rgb(var(${variable}))`
+                : `rgb(var(${variable}) / ${opacityValue})`;
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        deepIndigo: withOpacity('--color-deepIndigo'),
+                        darkPurple: withOpacity('--color-darkPurple'),
+                        electricPurple: withOpacity('--color-electricPurple'),
+                        deepViolet: withOpacity('--color-deepViolet'),
+                        radiantPink: withOpacity('--color-radiantPink'),
+                        neonPink: withOpacity('--color-neonPink'),
+                        softPinkBg: withOpacity('--color-softPinkBg')
+                    },
+                    boxShadow: {
+                        'neon-pink': '0 0 25px rgb(var(--color-neonPink) / 0.45)',
+                        'neon-purple': '0 0 25px rgb(var(--color-electricPurple) / 0.45)',
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="min-h-[100dvh] flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-md h-[100dvh] md:h-[920px] bg-deepIndigo sm:rounded-[44px] shadow-neon-purple overflow-hidden flex flex-col relative border-0 sm:border-[8px] border-slate-900">
+
+        <hb-device-header></hb-device-header>
+        <hb-toast></hb-toast>
+        <hb-active-walk-banner></hb-active-walk-banner>
+
+        <div id="herbuddy-app-container" class="flex-1 min-h-0 flex flex-col relative bg-deepIndigo">
+            <main id="app-content" class="flex-1 min-h-0 overflow-y-auto no-scrollbar relative px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-5 space-y-4">
+                <hb-login-screen></hb-login-screen>
+                <hb-tab-home></hb-tab-home>
+                <hb-tab-match></hb-tab-match>
+                <hb-tab-find></hb-tab-find>
+                <hb-tab-wellness></hb-tab-wellness>
+                <hb-tab-chat></hb-tab-chat>
+                <hb-tab-create></hb-tab-create>
+                <hb-tab-pickup></hb-tab-pickup>
+                <hb-tab-profile></hb-tab-profile>
+            </main>
+
+            <hb-nav-bar></hb-nav-bar>
+        </div>
+    </div>
+
+    <hb-edit-profile-modal></hb-edit-profile-modal>
+    <hb-errand-modal></hb-errand-modal>
+    <hb-mutual-match-modal></hb-mutual-match-modal>
+    <hb-fake-call-modal></hb-fake-call-modal>
+    <hb-report-modal></hb-report-modal>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
