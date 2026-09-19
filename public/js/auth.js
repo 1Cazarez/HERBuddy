@@ -70,8 +70,44 @@ function applyProfile(profile) {
         steps: profile.steps,
         activeMinutes: profile.active_minutes,
         weeklyDistance: profile.weekly_distance,
-        completedErrands: profile.completed_errands
+        completedErrands: profile.completed_errands,
+        year: profile.year || appState.user.year,
+        major: profile.major || appState.user.major,
+        interests: profile.interests || appState.user.interests,
+        clubs: profile.clubs || appState.user.clubs,
+        events: profile.events || appState.user.events,
+        zone: profile.zone || appState.user.zone,
+        walkingStyle: profile.walking_style || appState.user.walkingStyle
     });
+}
+
+function showProfileSetupStep(email) {
+    const signinStep = document.getElementById('auth-step-signin');
+    const profileStep = document.getElementById('auth-step-profile');
+    if (signinStep) signinStep.classList.add('hidden');
+    if (profileStep) profileStep.classList.remove('hidden');
+    const verifiedEl = document.getElementById('auth-verified-email');
+    if (verifiedEl) verifiedEl.innerText = `Verified: ${email}`;
+    if (window.lucide) lucide.createIcons();
+}
+
+// Submits the Year/Major onboarding step shown after a verified Auth0
+// sign-in whose profile doesn't have them yet, then enters the app.
+export async function completeProfileSetup(e) {
+    if (e) e.preventDefault();
+    appState.user.year = document.getElementById('login-year').value;
+    appState.user.major = document.getElementById('login-major').value;
+
+    if (backendEnabled && appState.userId) {
+        try {
+            await apiPut('/me', { year: appState.user.year, major: appState.user.major });
+        } catch (err) {
+            console.warn('Herbuddy: failed to save onboarding profile fields.', err);
+        }
+    }
+
+    appState.isLoggedIn = true;
+    completeLogin();
 }
 
 // Called once on page load. If Auth0/TigerData are configured and the user
@@ -88,8 +124,9 @@ export async function initAuthListener() {
     appState.user.name = user.name || user.nickname || appState.user.name;
     appState.user.email = user.email || appState.user.email;
 
+    let profile = null;
     try {
-        const profile = await apiGet('/me'); // backend creates the row on first call
+        profile = await apiGet('/me'); // backend creates the row on first call
         applyProfile(profile);
 
         // The access token used to authenticate that call doesn't carry
@@ -97,11 +134,18 @@ export async function initAuthListener() {
         // brand-new row comes back with placeholder name/email. Backfill it
         // once from what Auth0 told us directly.
         if (!profile.email && user.email) {
-            const updated = await apiPut('/me', { name: user.name || user.nickname, email: user.email });
-            applyProfile(updated);
+            profile = await apiPut('/me', { name: user.name || user.nickname, email: user.email });
+            applyProfile(profile);
         }
     } catch (err) {
         console.warn('Herbuddy: failed to load profile from the API, using Auth0 profile only.', err);
+    }
+
+    // First-time sign-ins (or ones from before this field existed) still
+    // need Year/Major before entering the app.
+    if (profile && (!profile.year || !profile.major)) {
+        showProfileSetupStep(user.email || appState.user.email);
+        return;
     }
 
     appState.isLoggedIn = true;

@@ -76,8 +76,9 @@ body {
    the wrapper instead of the actual control). `display: contents` removes
    the wrapper from layout entirely so only its children participate. */
 hb-toast, hb-device-header, hb-active-walk-banner, hb-login-screen,
-hb-tab-home, hb-tab-find, hb-tab-wellness, hb-tab-chat, hb-tab-create,
-hb-tab-pickup, hb-tab-profile, hb-nav-bar, hb-edit-profile-modal, hb-errand-modal {
+hb-tab-home, hb-tab-match, hb-tab-find, hb-tab-wellness, hb-tab-chat, hb-tab-create,
+hb-tab-pickup, hb-tab-profile, hb-nav-bar, hb-edit-profile-modal, hb-errand-modal,
+hb-mutual-match-modal {
     display: contents;
 }
 .no-scrollbar::-webkit-scrollbar { display: none; }

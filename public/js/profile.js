@@ -3,6 +3,7 @@ import { apiPut } from './api.js';
 import { appState } from './state.js';
 import { showToast } from './utils.js';
 import { highlightActiveSwatch } from './theme.js';
+import { resetMatches } from './match.js';
 
 export function syncStateToUI() {
     const u = appState.user;
@@ -56,6 +57,15 @@ export function openEditProfileModal() {
     document.getElementById('edit-contact').value = appState.user.contact;
     document.getElementById('edit-stepgoal').value = appState.user.stepGoal;
     document.getElementById('modal-avatar-preview').innerText = appState.user.avatar;
+
+    document.getElementById('edit-year').value = appState.user.year || 'Freshman';
+    document.getElementById('edit-major').value = appState.user.major || '';
+    document.getElementById('edit-interests').value = (appState.user.interests || []).join(', ');
+    document.getElementById('edit-clubs').value = (appState.user.clubs || []).join(', ');
+    document.getElementById('edit-events').value = (appState.user.events || []).join(', ');
+    document.getElementById('edit-zone').value = appState.user.zone || 'Library Area';
+    document.getElementById('edit-walkingstyle').value = appState.user.walkingStyle || 'Social';
+
     highlightActiveSwatch();
 }
 
@@ -77,7 +87,16 @@ export async function saveProfileEdits(e) {
     appState.user.contact = document.getElementById('edit-contact').value;
     appState.user.stepGoal = parseInt(document.getElementById('edit-stepgoal').value) || 10000;
 
+    appState.user.year = document.getElementById('edit-year').value;
+    appState.user.major = document.getElementById('edit-major').value;
+    appState.user.interests = document.getElementById('edit-interests').value.split(',').map(s => s.trim()).filter(Boolean);
+    appState.user.clubs = document.getElementById('edit-clubs').value.split(',').map(s => s.trim()).filter(Boolean);
+    appState.user.events = document.getElementById('edit-events').value.split(',').map(s => s.trim()).filter(Boolean);
+    appState.user.zone = document.getElementById('edit-zone').value;
+    appState.user.walkingStyle = document.getElementById('edit-walkingstyle').value;
+
     syncStateToUI();
+    resetMatches();
     closeEditProfileModal();
     showToast("Profile Updated!", "App profile details successfully saved.");
 
@@ -89,7 +108,14 @@ export async function saveProfileEdits(e) {
                 campus: appState.user.campus,
                 contact: appState.user.contact,
                 step_goal: appState.user.stepGoal,
-                avatar: appState.user.avatar
+                avatar: appState.user.avatar,
+                year: appState.user.year,
+                major: appState.user.major,
+                interests: appState.user.interests,
+                clubs: appState.user.clubs,
+                events: appState.user.events,
+                zone: appState.user.zone,
+                walking_style: appState.user.walkingStyle
             });
         } catch (err) {
             console.warn('Herbuddy: failed to sync profile to the API.', err);

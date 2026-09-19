@@ -14,8 +14,25 @@ CREATE TABLE IF NOT EXISTS users (
     active_minutes INTEGER NOT NULL DEFAULT 38,
     weekly_distance NUMERIC NOT NULL DEFAULT 14.8,
     completed_errands INTEGER NOT NULL DEFAULT 9,
+    year TEXT,
+    major TEXT,
+    interests TEXT[] NOT NULL DEFAULT '{}',
+    clubs TEXT[] NOT NULL DEFAULT '{}',
+    events TEXT[] NOT NULL DEFAULT '{}',
+    zone TEXT,
+    walking_style TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Buddy-match profile fields, added after the initial launch — safe to
+-- re-run against a database that already has the users table from before.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS year TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS major TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS interests TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS clubs TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS events TEXT[] NOT NULL DEFAULT '{}';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS zone TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS walking_style TEXT;
 
 CREATE TABLE IF NOT EXISTS walks (
     id SERIAL PRIMARY KEY,

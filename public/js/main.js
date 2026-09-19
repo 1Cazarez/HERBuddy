@@ -15,10 +15,12 @@ import './components/tab-profile.js';
 import './components/nav-bar.js';
 import './components/edit-profile-modal.js';
 import './components/errand-modal.js';
+import './components/tab-match.js';
+import './components/mutual-match-modal.js';
 
 import { showToast, hideToast, updateClock } from './utils.js';
 import { switchTab } from './navigation.js';
-import { handleLoginSubmit, loginWithAuth0AndProceed, logoutToLoginScreen, initAuthListener } from './auth.js';
+import { handleLoginSubmit, loginWithAuth0AndProceed, completeProfileSetup, logoutToLoginScreen, initAuthListener } from './auth.js';
 import { openEditProfileModal, closeEditProfileModal, selectEditAvatar, saveProfileEdits } from './profile.js';
 import { handleSendChatMessage } from './chat.js';
 import {
@@ -28,8 +30,7 @@ import {
     checkRouteMatches,
     handleCreateWalk,
     quickJoinSuggestedRoute,
-    triggerArrivalCheckIn,
-    simulateFindMapMove
+    triggerArrivalCheckIn
 } from './walks.js';
 import {
     renderErrandList,
@@ -40,18 +41,29 @@ import {
 } from './errands.js';
 import { triggerEmergencyCheckInTest } from './sos.js';
 import { initTheme, selectTheme } from './theme.js';
+import { updateRouteEstimate, simulateFindMapMove } from './map.js';
+import {
+    renderMatchCard,
+    skipBuddy,
+    resetMatches,
+    connectWithBuddy,
+    closeMutualMatchModal,
+    planWalkWithMatch
+} from './match.js';
 
 Object.assign(window, {
     switchTab,
-    handleLoginSubmit, loginWithAuth0AndProceed, logoutToLoginScreen,
+    handleLoginSubmit, loginWithAuth0AndProceed, completeProfileSetup, logoutToLoginScreen,
     openEditProfileModal, closeEditProfileModal, selectEditAvatar, saveProfileEdits,
     handleSendChatMessage,
     renderWalkList, setFilter, joinWalkFromList, checkRouteMatches, handleCreateWalk,
-    quickJoinSuggestedRoute, triggerArrivalCheckIn, simulateFindMapMove,
+    quickJoinSuggestedRoute, triggerArrivalCheckIn,
     renderErrandList, acceptErrandRequest, openNewErrandModal, closeNewErrandModal, submitNewErrand,
     triggerEmergencyCheckInTest,
     showToast, hideToast,
-    selectTheme
+    selectTheme,
+    updateRouteEstimate, simulateFindMapMove,
+    skipBuddy, resetMatches, connectWithBuddy, closeMutualMatchModal, planWalkWithMatch
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     renderWalkList();
     renderErrandList();
+    renderMatchCard();
     updateClock();
     setInterval(updateClock, 30000);
     initAuthListener();

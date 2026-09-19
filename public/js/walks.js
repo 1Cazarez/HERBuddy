@@ -4,6 +4,7 @@ import { appState } from './state.js';
 import { showToast } from './utils.js';
 import { switchTab } from './navigation.js';
 import { syncStateToUI } from './profile.js';
+import { gsuLocations, calcDistanceMiles, startRealWalkTracking, stopWalkTracking } from './map.js';
 
 const POLL_INTERVAL_MS = 4000;
 let pollHandle = null;
@@ -144,22 +145,39 @@ export function checkRouteMatches() {
 
 export async function handleCreateWalk(e) {
     if (e) e.preventDefault();
-    const title = document.getElementById('input-route-title').value;
-    const from = document.getElementById('input-origin').value;
-    const to = document.getElementById('input-destination').value;
+    const originId = parseInt(document.getElementById('input-origin').value, 10);
+    const destId = parseInt(document.getElementById('input-destination').value, 10);
     const time = document.getElementById('input-time').value;
-    const distance = document.getElementById('input-distance').value;
 
-    appState.activeWalk = { title, from, to, distance: `${distance} miles`, buddies: 3 };
+    const originLoc = gsuLocations.find(l => l.id === originId);
+    const destLoc = gsuLocations.find(l => l.id === destId);
+    if (!originLoc || !destLoc) {
+        showToast("Missing Info", "Please select both an origin and a destination.");
+        return;
+    }
+
+    const title = document.getElementById('input-route-title').value || `${originLoc.name} → ${destLoc.name}`;
+    const distanceMiles = calcDistanceMiles(originLoc, destLoc);
+
+    appState.activeWalk = {
+        title,
+        from: originLoc.name,
+        to: destLoc.name,
+        destinationName: destLoc.name,
+        distance: `${distanceMiles} miles`,
+        buddies: 3
+    };
+
+    startRealWalkTracking(originLoc, destLoc);
 
     if (backendEnabled) {
         try {
             await apiPost('/walks', {
                 title,
-                from_location: from,
-                to_location: to,
+                from_location: originLoc.name,
+                to_location: destLoc.name,
                 time,
-                distance: `${distance} mi`,
+                distance: `${distanceMiles} mi`,
                 night_safe: false,
                 avatars: [appState.user.avatar]
             });
@@ -170,12 +188,22 @@ export async function handleCreateWalk(e) {
     }
 
     showActiveWalkBanner();
-    showToast("🟢 Walk Scheduled!", `Walking safely to ${to}. Safety check-in active.`);
-    switchTab('home');
+    showToast("🟢 Walk Scheduled!", `Walking safely to ${destLoc.name}. Safety check-in active.`);
+    switchTab('find');
 }
 
 export function quickJoinSuggestedRoute() {
-    appState.activeWalk = { title: "Student Center → Library", from: "Student Center", to: "Library", distance: "1.2 miles", buddies: 3 };
+    const originLoc = gsuLocations.find(l => l.name === "Student Center East");
+    const destLoc = gsuLocations.find(l => l.name === "GSU Library");
+    appState.activeWalk = {
+        title: "Student Center → Library",
+        from: "Student Center East",
+        to: "GSU Library",
+        destinationName: "GSU Library",
+        distance: originLoc && destLoc ? `${calcDistanceMiles(originLoc, destLoc)} miles` : "1.2 miles",
+        buddies: 3
+    };
+    if (originLoc && destLoc) startRealWalkTracking(originLoc, destLoc);
     showActiveWalkBanner();
     showToast("Joined Walk Group!", "3 campus buddies notified. Safety check-in initiated.");
 }
@@ -200,13 +228,15 @@ export async function triggerArrivalCheckIn() {
     clearInterval(appState.timerInterval);
     appState.timerInterval = null;
     document.getElementById('active-walk-banner').classList.add('hidden');
+    stopWalkTracking();
 
     appState.user.steps += 2400;
     appState.user.activeMinutes += 23;
     appState.user.weeklyDistance = (parseFloat(appState.user.weeklyDistance) + 1.2).toFixed(1);
 
     syncStateToUI();
-    showToast("🎉 Safe Arrival Confirmed!", `Trusted contact notified & +2,400 steps added for ${appState.user.name.split(' ')[0]} ${appState.user.avatar}!`);
+    const destName = (appState.activeWalk && appState.activeWalk.destinationName) || "your destination";
+    showToast("🎉 Arrived Safely!", `You've safely arrived at ${destName}. ${appState.user.contact.split('-')[0]} has been notified.`);
 
     if (backendEnabled && appState.userId) {
         try {
@@ -219,19 +249,4 @@ export async function triggerArrivalCheckIn() {
             console.warn('Herbuddy: failed to sync arrival stats to the API.', err);
         }
     }
-}
-
-export function simulateFindMapMove() {
-    const pin = document.getElementById('find-map-user-pin');
-    if (!pin) return;
-
-    pin.style.top = '28%';
-    pin.style.left = '65%';
-    showToast("Navigation Active", "Moving along lit campus route on radar...");
-
-    setTimeout(() => {
-        pin.style.top = '15%';
-        pin.style.left = '82%';
-        showToast("Safe Arrival Near!", "You are approaching the Library destination.");
-    }, 2500);
 }

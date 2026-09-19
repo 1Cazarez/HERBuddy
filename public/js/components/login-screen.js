@@ -14,14 +14,42 @@ const localLoginForm = `
     </form>
 `;
 
-const auth0LoginButton = `
-    <div class="gradient-card p-6 rounded-3xl space-y-4 w-full max-w-xs shadow-neon-purple border border-neonPink/40 text-left">
-        <p class="text-xs text-slate-300">Sign in with your campus account to sync your profile, chat, and walks across devices.</p>
+const auth0LoginSteps = `
+    <div id="auth-step-signin" class="gradient-card p-6 rounded-3xl space-y-4 w-full max-w-xs shadow-neon-purple border border-neonPink/40 text-center">
+        <p class="text-xs text-slate-300">Sign in securely with your GSU email through Auth0.</p>
         <button onclick="loginWithAuth0AndProceed()" class="w-full gradient-brand text-white font-black text-xs py-3.5 rounded-2xl shadow-neon-pink hover:opacity-95 transition active:scale-95 flex items-center justify-center gap-2">
-            <span>LOG IN WITH AUTH0</span>
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>SIGN IN WITH GSU EMAIL</span>
+        </button>
+        <p id="auth-error-msg" class="hidden text-[11px] text-rose-400"></p>
+    </div>
+
+    <form id="auth-step-profile" onsubmit="completeProfileSetup(event)" class="hidden gradient-card p-6 rounded-3xl space-y-4 w-full max-w-xs shadow-neon-purple border border-neonPink/40 text-left">
+        <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+            <i data-lucide="badge-check" class="w-4 h-4"></i>
+            <span id="auth-verified-email">Verified</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+            <div>
+                <label class="block text-xs font-bold text-neonPink mb-1.5 uppercase tracking-wider">Year</label>
+                <select id="login-year" required class="w-full bg-black/50 border border-white/20 px-3 py-3 rounded-2xl text-xs text-white">
+                    <option value="">Select</option>
+                    <option>Freshman</option>
+                    <option>Sophomore</option>
+                    <option>Junior</option>
+                    <option>Senior</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-neonPink mb-1.5 uppercase tracking-wider">Major</label>
+                <input type="text" id="login-major" required placeholder="e.g. CIS" class="w-full bg-black/50 border border-white/20 px-3 py-3 rounded-2xl text-xs text-white">
+            </div>
+        </div>
+        <button type="submit" class="w-full gradient-brand text-white font-black text-xs py-3.5 rounded-2xl shadow-neon-pink hover:opacity-95 transition active:scale-95 flex items-center justify-center gap-2">
+            <span>ENTER HERBUDDY</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
-    </div>
+    </form>
 `;
 
 customElements.define('hb-login-screen', class extends HTMLElement {
@@ -48,7 +76,7 @@ customElements.define('hb-login-screen', class extends HTMLElement {
                 <p class="text-xs text-slate-300">Your safe campus walking & women's community companion.</p>
             </div>
 
-            ${backendEnabled ? auth0LoginButton : localLoginForm}
+            ${backendEnabled ? auth0LoginSteps : localLoginForm}
         </section>
         `;
     }
