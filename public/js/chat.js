@@ -3,8 +3,22 @@ import { apiGet, apiPost } from './api.js';
 import { appState } from './state.js';
 import { escapeHtml } from './utils.js';
 
+const GROUP_ROOM = 'main-quad';
 const POLL_INTERVAL_MS = 3000;
 let pollHandle = null;
+let activeRoom = GROUP_ROOM;
+
+export function buddyRoom(buddyName) {
+    return `buddy:${appState.userId}:${buddyName}`;
+}
+
+// Switches which room the poller/renderer targets — used when the user
+// taps a matched buddy's avatar to open their 1:1 thread, or 'main-quad'
+// to go back to the shared group chat.
+export function setActiveRoom(room) {
+    activeRoom = room;
+    refreshChat();
+}
 
 export function subscribeToChat() {
     if (!backendEnabled) return;
@@ -15,8 +29,9 @@ export function subscribeToChat() {
 }
 
 async function refreshChat() {
+    if (!backendEnabled) return;
     try {
-        const messages = await apiGet('/chat/messages');
+        const messages = await apiGet(`/chat/messages?room=${encodeURIComponent(activeRoom)}`);
         renderChatMessages(messages);
     } catch (err) {
         console.warn('Herbuddy: failed to refresh chat from the API.', err);
@@ -71,6 +86,18 @@ function appendLocalMessage(msg) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Seeds a canned "message from the buddy" line (e.g. their opening greeting
+// right after a match) into the caller's own private buddy room.
+export async function postAsBuddy(room, { text, name, avatar }) {
+    if (!backendEnabled) return;
+    try {
+        await apiPost('/chat/messages', { room, text, name, avatar, asBuddy: true });
+        if (room === activeRoom) refreshChat();
+    } catch (err) {
+        console.warn('Herbuddy: failed to seed buddy greeting message.', err);
+    }
+}
+
 export async function handleSendChatMessage(e) {
     if (e) e.preventDefault();
     const input = document.getElementById('chat-input-text');
@@ -82,7 +109,8 @@ export async function handleSendChatMessage(e) {
             await apiPost('/chat/messages', {
                 text: msg,
                 name: appState.user.name.split(' ')[0],
-                avatar: appState.user.avatar
+                avatar: appState.user.avatar,
+                room: activeRoom
             });
             input.value = '';
             refreshChat(); // don't wait for the next poll tick

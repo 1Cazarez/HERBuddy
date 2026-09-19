@@ -5,6 +5,7 @@ import { showToast } from './utils.js';
 import { switchTab } from './navigation.js';
 import { syncStateToUI } from './profile.js';
 import { gsuLocations, calcDistanceMiles, startRealWalkTracking, stopWalkTracking } from './map.js';
+import { playSnsAudioAlert } from './sos.js';
 
 const POLL_INTERVAL_MS = 4000;
 let pollHandle = null;
@@ -214,6 +215,7 @@ export async function handleCreateWalk(e) {
 
     const title = document.getElementById('input-route-title').value || `${originLoc.name} → ${destLoc.name}`;
     const distanceMiles = calcDistanceMiles(originLoc, destLoc);
+    const alertMinutes = parseInt(document.getElementById('input-alert-timeout').value, 10) || 30;
 
     appState.activeWalk = {
         title,
@@ -221,7 +223,9 @@ export async function handleCreateWalk(e) {
         to: destLoc.name,
         destinationName: destLoc.name,
         distance: `${distanceMiles} miles`,
-        buddies: 3
+        buddies: 3,
+        alertMinutes,
+        alertTriggered: false
     };
 
     startRealWalkTracking(originLoc, destLoc);
@@ -257,7 +261,9 @@ export function quickJoinSuggestedRoute() {
         to: "GSU Library",
         destinationName: "GSU Library",
         distance: originLoc && destLoc ? `${calcDistanceMiles(originLoc, destLoc)} miles` : "1.2 miles",
-        buddies: 3
+        buddies: 3,
+        alertMinutes: 30,
+        alertTriggered: false
     };
     if (originLoc && destLoc) startRealWalkTracking(originLoc, destLoc);
     showActiveWalkBanner();
@@ -276,8 +282,21 @@ export function showActiveWalkBanner() {
             const mins = Math.floor(appState.secondsElapsed / 60);
             const secs = appState.secondsElapsed % 60;
             document.getElementById('walk-timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            const limitMinutes = (appState.activeWalk && appState.activeWalk.alertMinutes) || 30;
+            if (appState.activeWalk && !appState.activeWalk.alertTriggered && appState.secondsElapsed >= limitMinutes * 60) {
+                appState.activeWalk.alertTriggered = true;
+                triggerLateArrivalAlert();
+            }
         }, 1000);
     }
+}
+
+function triggerLateArrivalAlert() {
+    playSnsAudioAlert();
+    const banner = document.getElementById('active-walk-banner');
+    banner.querySelector('div').classList.add('!from-rose-700', '!via-red-700', '!to-rose-800');
+    showToast("⚠️ Overdue Check-in!", `You haven't arrived yet. ${appState.user.contact} has been alerted automatically.`);
 }
 
 export async function triggerArrivalCheckIn() {

@@ -8,7 +8,7 @@ customElements.define('hb-mutual-match-modal', class extends HTMLElement {
                 <p class="text-xs text-slate-300" id="mutual-match-text">You and Maya have a lot in common.</p>
                 <div class="flex flex-col gap-2 pt-2">
                     <button onclick="planWalkWithMatch()" class="w-full gradient-brand text-white font-black py-3 rounded-xl shadow-neon-pink hover:opacity-95 transition">Plan a Walk</button>
-                    <button onclick="closeMutualMatchModal()" class="w-full bg-white/10 border border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">Message Later</button>
+                    <button onclick="openChatWithMatchedBuddy()" class="w-full bg-white/10 border border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">Message Now</button>
                 </div>
             </div>
         </div>

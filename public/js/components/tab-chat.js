@@ -10,17 +10,25 @@ customElements.define('hb-tab-chat', class extends HTMLElement {
                 <span class="px-2.5 py-1 bg-sky-500/20 border border-sky-500/40 text-sky-300 rounded-xl text-xs font-bold">Live</span>
             </div>
 
+            <div id="conversation-list" class="hidden flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <button onclick="switchToGroupChat()" class="flex flex-col items-center gap-1 flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full gradient-brand flex items-center justify-center text-lg">🌸</div>
+                    <span class="text-[9px] font-bold text-slate-300">Group</span>
+                </button>
+            </div>
+
             <div class="gradient-card p-3.5 rounded-3xl flex flex-col h-[360px] border border-neonPink/30 shadow-neon-purple justify-between">
                 <!-- Chat Messages Header -->
                 <div class="flex items-center justify-between pb-2.5 border-b border-white/10 text-xs">
                     <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-sm">🌸</div>
+                        <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-sm" id="chat-header-avatar">🌸</div>
                         <div>
-                            <h4 class="font-bold text-white">Main Quad Evening Walkers</h4>
-                            <span class="text-[9px] text-emerald-400">4 members active</span>
+                            <h4 class="font-bold text-white" id="chat-header-name">Main Quad Evening Walkers</h4>
+                            <span class="text-[9px] text-emerald-400" id="chat-header-status">4 members active</span>
                         </div>
                     </div>
-                    <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-slate-300">Encrypted</span>
+                    <button id="chat-remove-btn" onclick="removeCurrentMatchedBuddy()" class="hidden text-[10px] bg-rose-950/80 border border-rose-500/40 text-rose-300 font-bold px-2 py-0.5 rounded-full hover:bg-rose-900/80 transition">Remove</button>
+                    <span id="chat-encrypted-badge" class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-slate-300">Encrypted</span>
                 </div>
 
                 <!-- Message Feed -->

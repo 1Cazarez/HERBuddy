@@ -18,6 +18,7 @@ const { default: walksRouter } = await import('./routes/walks.js');
 const { default: errandsRouter } = await import('./routes/errands.js');
 const { default: chatRouter } = await import('./routes/chat.js');
 const { default: configRouter } = await import('./routes/config.js');
+const { default: matchesRouter } = await import('./routes/matches.js');
 
 const app = express();
 
@@ -33,12 +34,18 @@ app.use('/api/me', checkJwt, meRouter);
 app.use('/api/walks', checkJwt, walksRouter);
 app.use('/api/errands', checkJwt, errandsRouter);
 app.use('/api/chat', checkJwt, chatRouter);
+app.use('/api/matches', checkJwt, matchesRouter);
 
 // Keep this last: express-oauth2-jwt-bearer throws an UnauthorizedError that
-// needs to be turned into a clean 401 instead of a stack trace.
+// needs to be turned into a clean 401 instead of a stack trace; our own
+// routes may also throw with a deliberate .status (e.g. 403 for a buddy
+// room that isn't the caller's).
 app.use((err, req, res, next) => {
     if (err.status === 401) {
         return res.status(401).json({ error: 'Unauthorized' });
+    }
+    if (err.status && err.status < 500) {
+        return res.status(err.status).json({ error: err.message || 'Request error' });
     }
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
