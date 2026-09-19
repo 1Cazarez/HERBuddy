@@ -71,25 +71,6 @@ customElements.define('hb-tab-home', class extends HTMLElement {
                 </button>
             </div>
 
-            <div class="gradient-card p-4 rounded-3xl shadow-sm relative">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                        <div class="p-2 bg-neonPink/20 text-neonPink rounded-xl border border-neonPink/30">
-                            <i data-lucide="package-check" class="w-4 h-4"></i>
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-black uppercase text-neonPink tracking-wider">📦 SMART PICKUP</span>
-                            <h4 class="text-xs font-bold text-white">Library Printouts Request</h4>
-                        </div>
-                    </div>
-                    <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-lg">On Your Path</span>
-                </div>
-                <p class="text-xs text-slate-300 mb-3">Someone is walking this route soon. Carry an errand along your path to earn +50 Wellness points!</p>
-                <button onclick="acceptErrandRequest(1)" class="w-full gradient-brand text-white font-black text-xs py-2.5 rounded-xl shadow-neon-pink hover:opacity-95 transition flex items-center justify-center gap-1.5">
-                    <i data-lucide="package-plus" class="w-4 h-4"></i> ACCEPT PICKUP
-                </button>
-            </div>
-
             <div class="gradient-card p-4 rounded-3xl space-y-3">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Daily Wellness Summary</h3>
