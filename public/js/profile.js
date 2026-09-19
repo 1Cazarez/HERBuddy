@@ -4,6 +4,9 @@ import { appState } from './state.js';
 import { showToast } from './utils.js';
 import { highlightActiveSwatch } from './theme.js';
 import { resetMatches } from './match.js';
+import { switchTab } from './navigation.js';
+
+let tabBeforeModal = 'home';
 
 export function syncStateToUI() {
     const u = appState.user;
@@ -40,14 +43,12 @@ export function syncStateToUI() {
     document.getElementById('step-progress-bar').style.width = `${pct}%`;
     document.getElementById('profile-weekly-pct').innerText = `${pct}% Goal Met`;
 
-    document.getElementById('active-errand-carrier-emoji').innerText = u.avatar;
-    document.getElementById('active-errand-carrier').innerText = u.name.split(' ')[0];
-
-    const mapMarkerEmoji = document.getElementById('find-map-avatar-marker');
-    if (mapMarkerEmoji) mapMarkerEmoji.innerText = u.avatar;
 }
 
 export function openEditProfileModal() {
+    const activeTab = document.querySelector('.tab-content.active');
+    tabBeforeModal = activeTab ? activeTab.id.replace('tab-', '') : 'home';
+
     const modal = document.getElementById('edit-profile-modal');
     modal.classList.remove('opacity-0', 'pointer-events-none');
 
@@ -98,6 +99,7 @@ export async function saveProfileEdits(e) {
     syncStateToUI();
     resetMatches();
     closeEditProfileModal();
+    switchTab(tabBeforeModal || 'home');
     showToast("Profile Updated!", "App profile details successfully saved.");
 
     if (backendEnabled && appState.userId) {
