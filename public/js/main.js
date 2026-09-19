@@ -40,7 +40,13 @@ import {
     acceptErrandRequest,
     openNewErrandModal,
     closeNewErrandModal,
-    submitNewErrand
+    submitNewErrand,
+    setPickupMode,
+    submitPickupRequest,
+    acceptPickupRequest,
+    markPickupCollected,
+    markPickupDelivered,
+    renderPickupRequestList
 } from './errands.js';
 import { triggerEmergencyCheckInTest } from './sos.js';
 import { initTheme, selectTheme } from './theme.js';
@@ -69,6 +75,8 @@ Object.assign(window, {
     renderWalkList, setFilter, joinWalkFromList, checkRouteMatches, handleCreateWalk,
     quickJoinSuggestedRoute, triggerArrivalCheckIn,
     renderErrandList, acceptErrandRequest, openNewErrandModal, closeNewErrandModal, submitNewErrand,
+    setPickupMode, submitPickupRequest, acceptPickupRequest, markPickupCollected, markPickupDelivered,
+    renderPickupRequestList,
     triggerEmergencyCheckInTest,
     showToast, hideToast,
     selectTheme,
@@ -87,6 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     renderWalkList();
     renderErrandList();
+    renderPickupRequestList();
+    setPickupMode('request');
     renderMatchCard();
     renderSafetyReports();
     updateClock();

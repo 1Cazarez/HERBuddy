@@ -10,45 +10,50 @@ customElements.define('hb-tab-pickup', class extends HTMLElement {
                     </div>
                     <h1 class="text-2xl font-black text-white">Smart Pickups</h1>
                 </div>
-                <button onclick="openNewErrandModal()" class="bg-neonPink/20 text-neonPink text-xs font-black px-3 py-1.5 rounded-xl border border-neonPink/40 hover:bg-neonPink/30 transition">
-                    + Request Errand
+            </div>
+
+            <div class="flex gap-2 mb-3">
+                <button id="pickup-mode-request" onclick="setPickupMode('request')" class="flex-1 py-2 rounded-xl font-black text-xs border transition bg-neonPink/20 text-neonPink border-neonPink/40">
+                    Request
+                </button>
+                <button id="pickup-mode-deliver" onclick="setPickupMode('deliver')" class="flex-1 py-2 rounded-xl font-black text-xs border transition bg-slate-900/60 text-slate-300 border-white/10">
+                    Deliver
                 </button>
             </div>
 
-            <div class="gradient-card p-4 rounded-3xl shadow-lg border border-neonPink/40">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] uppercase font-extrabold text-neonPink tracking-wider">Active Community Errand</span>
-                    <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full border border-white/10 text-white" id="errand-tracker-status">In Transit</span>
-                </div>
-                <h3 class="text-xs font-bold text-white" id="active-errand-title">Library Printouts Dropoff</h3>
-                <p class="text-[11px] text-slate-300 mb-3 flex items-center gap-1">
-                    Carrier: <span id="active-errand-carrier-emoji">🦊</span> <span id="active-errand-carrier">Alex</span> (Student Center &rarr; Library)
-                </p>
-
-                <div class="grid grid-cols-4 gap-1 text-center text-[9px] font-bold text-slate-400">
-                    <div class="step-item text-neonPink">
-                        <div class="h-1.5 bg-neonPink rounded-full mb-1"></div>
-                        <span>Requested</span>
+            <div id="pickup-request-panel" class="space-y-3">
+                <div class="gradient-card p-4 rounded-3xl shadow-lg border border-neonPink/40 space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Pickup request</label>
+                        <textarea id="pickup-request-text" rows="3" class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white text-xs" placeholder="Describe what you need picked up..."></textarea>
                     </div>
-                    <div class="step-item text-neonPink">
-                        <div class="h-1.5 bg-neonPink rounded-full mb-1"></div>
-                        <span>Matched</span>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Delivery location</label>
+                        <input id="pickup-delivery-location" type="text" class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white text-xs" placeholder="Library desk, Student Center, etc." value="Library Desk">
                     </div>
-                    <div id="step-transit" class="step-item text-neonPink">
-                        <div class="h-1.5 bg-neonPink rounded-full mb-1"></div>
-                        <span>In Transit</span>
+                    <div>
+                        <label for="pickup-priority" class="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">Priority</label>
+                        <select id="pickup-priority" class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white text-xs">
+                            <option value="normal">Normal</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
                     </div>
-                    <div id="step-delivered" class="step-item">
-                        <div class="h-1.5 bg-white/20 rounded-full mb-1"></div>
-                        <span>Delivered</span>
-                    </div>
+                    <button onclick="submitPickupRequest()" class="w-full gradient-brand text-white font-black py-3 rounded-xl shadow-neon-pink hover:opacity-95 transition">
+                        Submit Request
+                    </button>
                 </div>
             </div>
 
-            <div class="space-y-3">
-                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Nearby Pickup Opportunities</h3>
-                <div id="errands-list" class="space-y-3">
-                    <!-- Dynamic errands inserted via JS -->
+            <div id="pickup-deliver-panel" class="hidden space-y-3">
+                <div class="space-y-3">
+                    <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Open Requests</h3>
+                    <div id="pickup-request-list" class="space-y-3">
+                        <!-- Dynamic request list -->
+                    </div>
+                </div>
+
+                <div id="pickup-status-panel" class="mt-3">
+                    <div class="text-xs text-slate-300">No active accepted request.</div>
                 </div>
             </div>
         </section>

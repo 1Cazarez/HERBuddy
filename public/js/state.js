@@ -88,5 +88,25 @@ export const appState = {
             status: "Pending"
         }
     ],
+    pickupMode: 'request',
+    pickupRequests: [
+        {
+            id: 1,
+            request: "Need someone to grab my chemistry lab notes and drop them at the library desk.",
+            deliveryLocation: "Library Desk",
+            emergency: false,
+            requester: "Maya Chen",
+            status: 'open'
+        },
+        {
+            id: 2,
+            request: "Please take my water bottle and charger to the student center front desk.",
+            deliveryLocation: "Student Center Front Desk",
+            emergency: true,
+            requester: "Alicia Brooks",
+            status: 'open'
+        }
+    ],
+    activePickupRequestId: null,
     activeFilter: 'all'
 };
