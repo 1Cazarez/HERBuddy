@@ -18,14 +18,9 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        // Google Maps' `callback=initMap` can fire before or after our own
-        // js/map.js module (which defines the real initMap) finishes
-        // loading. This placeholder covers the "Maps loads first" case;
-        // map.js covers the reverse by checking window.__gmapsReady.
-        window.initMap = function () { window.__gmapsReady = true; };
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrM2z5ElYSajqONKUGjLN2J6iL2Wt58sM&callback=initMap&loading=async" async defer></script>
+    <!-- Google Maps is loaded dynamically by js/map.js, which fetches the
+         API key from the backend (server/routes/config.js) instead of it
+         being hardcoded here. -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 

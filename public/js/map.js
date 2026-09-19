@@ -1,4 +1,5 @@
 import { showToast } from './utils.js';
+import { API_BASE_URL } from './api-config.js';
 
 // Real GSU campus locations used for both the map markers and the
 // origin/destination pickers on the Create Walk form.
@@ -200,11 +201,25 @@ function realInitMap() {
 }
 
 // The Google Maps script tag calls window.initMap via its `callback=initMap`
-// param, and can finish loading before or after this module does. A tiny
-// placeholder in index.html's <head> covers the "Maps loads first" case by
-// setting window.__gmapsReady; this covers "our module loads first".
-if (window.__gmapsReady) {
-    realInitMap();
-} else {
-    window.initMap = realInitMap;
-}
+// param, so this needs to exist before that script is even injected below.
+window.initMap = realInitMap;
+
+// The API key lives only in the backend's env vars (Render), never in this
+// repo — fetched here and used to build the script tag at runtime. It's
+// still visible in the browser once loaded (unavoidable for a client-side
+// Maps key); the real protection is the HTTP-referrer restriction set on
+// the key itself in Google Cloud Console.
+fetch(`${API_BASE_URL}/config`)
+    .then(res => res.json())
+    .then(({ googleMapsApiKey }) => {
+        if (!googleMapsApiKey) {
+            console.warn('Herbuddy: no Google Maps API key configured on the backend — the map will stay blank.');
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(googleMapsApiKey)}&callback=initMap&loading=async`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    })
+    .catch(err => console.warn('Herbuddy: failed to load Maps config from the API.', err));
