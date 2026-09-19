@@ -17,6 +17,7 @@ const { default: meRouter } = await import('./routes/me.js');
 const { default: walksRouter } = await import('./routes/walks.js');
 const { default: errandsRouter } = await import('./routes/errands.js');
 const { default: chatRouter } = await import('./routes/chat.js');
+const { default: configRouter } = await import('./routes/config.js');
 
 const app = express();
 
@@ -24,6 +25,9 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
 app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ ok: true }));
+
+// Public — no JWT check. See routes/config.js for why.
+app.use('/api/config', configRouter);
 
 app.use('/api/me', checkJwt, meRouter);
 app.use('/api/walks', checkJwt, walksRouter);
