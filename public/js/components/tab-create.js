@@ -14,7 +14,7 @@ customElements.define('hb-tab-create', class extends HTMLElement {
             <form id="create-walk-form" onsubmit="handleCreateWalk(event)" class="space-y-3.5">
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1">Route Name</label>
-                    <input type="text" id="input-route-title" required placeholder="e.g. Student Center to Library" oninput="checkRouteMatches()" class="w-full bg-black/40 border border-white/10 px-3.5 py-2.5 rounded-2xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-neonPink">
+                    <input type="text" id="input-route-title" placeholder="Leave blank to auto-name from your route" oninput="checkRouteMatches()" class="w-full bg-black/40 border border-white/10 px-3.5 py-2.5 rounded-2xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-neonPink">
                 </div>
 
                 <div class="grid grid-cols-2 gap-2.5">
