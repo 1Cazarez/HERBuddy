@@ -8,7 +8,11 @@ const router = Router();
 // on the key in Google Cloud Console, not hiding this endpoint.
 router.get('/', (req, res) => {
     res.json({
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || null
+        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || null,
+        companionAgents: {
+            friend: process.env.ELEVENLABS_AGENT_ID_FRIEND || null,
+            grandma: process.env.ELEVENLABS_AGENT_ID_GRANDMA || null
+        }
     });
 });
 

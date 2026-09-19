@@ -138,6 +138,9 @@ customElements.define('hb-tab-home', class extends HTMLElement {
                         Test SOS
                     </button>
                 </div>
+                <button onclick="openCompanionModal()" class="mt-1 w-full gradient-brand text-white font-black text-xs py-2.5 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+                    <i data-lucide="mic" class="w-4 h-4"></i> Talk to Walking Companion
+                </button>
                 <a href="tel:4044133333" class="mt-1 w-full bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs py-2.5 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
                     <i data-lucide="phone-call" class="w-4 h-4"></i> CALL GSU POLICE (404-413-3333)
                 </a>
