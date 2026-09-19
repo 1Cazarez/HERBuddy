@@ -4,7 +4,10 @@
 // Until you do, the app keeps running on local mock data (see state.js) and
 // the name-only login screen, exactly like before.
 
-export const API_BASE_URL = "http://localhost:4000/api";
+// Auto-switches so the same code works for local dev and the deployed site.
+export const API_BASE_URL = window.location.hostname === "localhost"
+    ? "http://localhost:4000/api"
+    : "https://herbuddy.onrender.com/api";
 
 export const AUTH0_DOMAIN = "dev-zkihg5tmwlk8og2v.us.auth0.com";
 export const AUTH0_CLIENT_ID = "NwGUkTAOiQZqrZEQNffJPnUoO5LNI3y3";
