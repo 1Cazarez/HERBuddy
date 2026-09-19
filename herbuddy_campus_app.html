@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCrM2z5ElYSajqONKUGjLN2J6iL2Wt58sM&callback=initMap&loading=async" async defer></script>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
@@ -122,9 +123,9 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden">
+<body class="min-h-screen flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden overflow-y-auto">
 
-    <div class="w-full max-w-md h-screen md:h-[920px] bg-deepIndigo sm:rounded-[44px] shadow-neon-purple overflow-hidden flex flex-col relative border-0 sm:border-[8px] border-slate-900">
+    <div id="phone-frame" class="w-full max-w-md bg-deepIndigo sm:rounded-[44px] shadow-neon-purple overflow-hidden flex flex-col relative border-0 sm:border-[8px] border-slate-900" style="height: 920px;">
 
         <!-- Phone Status & Header Bar -->
         <div id="device-header" class="hidden px-6 pt-3 pb-2 justify-between items-center text-xs font-semibold text-slate-300 z-40 bg-deepIndigo/90 backdrop-blur-md border-b border-white/10">
@@ -143,9 +144,6 @@
                 Herbuddy
             </button>
             <div class="flex items-center gap-2">
-                <button onclick="switchTab('home')" class="text-[10px] bg-white/10 text-slate-300 hover:text-white px-2 py-0.5 rounded-full font-bold flex items-center gap-1 transition">
-    <i data-lucide="home" class="w-3 h-3"></i> Home
-</button>
                 <i data-lucide="wifi" class="w-3.5 h-3.5 text-slate-400"></i>
                 <i data-lucide="battery" class="w-4 h-4 text-slate-400"></i>
                 <button onclick="openEditProfileModal()" title="Profile Preferences" class="p-1 rounded-full text-slate-300 hover:text-neonPink hover:bg-white/10 transition">
@@ -181,14 +179,22 @@
                     <span id="walk-timer" class="text-xs font-mono font-bold bg-black/30 px-2 py-0.5 rounded-md">23:14</span>
                 </div>
 
-                <div class="flex justify-between items-end">
+                <div class="flex justify-between items-end flex-wrap gap-1.5">
                     <div>
                         <h4 id="active-walk-route-name" class="text-xs font-extrabold text-white">Student Center &rarr; Library</h4>
                         <p class="text-[10px] text-emerald-100"><span id="active-walk-distance">1.2 miles</span> &bull; <span id="active-walk-buddies">2 buddies walking along</span></p>
                     </div>
-                    <button onclick="triggerArrivalCheckIn()" class="bg-white text-emerald-900 text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-emerald-50 transition active:scale-95 flex items-center gap-1">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> [ I'VE ARRIVED ]
-                    </button>
+                    <div class="flex gap-1.5">
+                        <button onclick="openSOSVoiceModal()" class="bg-white/20 text-white text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-white/30 transition active:scale-95 flex items-center gap-1">
+                            <i data-lucide="mic" class="w-3.5 h-3.5"></i> Companion
+                        </button>
+                        <button onclick="triggerArrivalCheckIn()" class="bg-white text-emerald-900 text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-emerald-50 transition active:scale-95 flex items-center gap-1">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> [ I'VE ARRIVED ]
+                        </button>
+                        <a href="tel:4044133333" class="bg-red-700 text-white text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-red-800 transition active:scale-95 flex items-center gap-1">
+                            <i data-lucide="phone-call" class="w-3.5 h-3.5"></i> POLICE
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -394,53 +400,6 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-4 gap-2">
-                    <button onclick="switchTab('create')" class="gradient-card p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-neonPink transition">
-                        <div class="w-8 h-8 rounded-xl bg-neonPink/20 text-neonPink flex items-center justify-center">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-200">Start Walk</span>
-                    </button>
-                    <button onclick="switchTab('find')" class="gradient-card p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-neonPink transition">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                            <i data-lucide="map" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-200">Find & Map</span>
-                    </button>
-                    <button onclick="switchTab('pickup')" class="gradient-card p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-neonPink transition">
-                        <div class="w-8 h-8 rounded-xl bg-radiantPink/20 text-radiantPink flex items-center justify-center">
-                            <i data-lucide="package" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-200">Pickups</span>
-                    </button>
-                    <button onclick="triggerEmergencyCheckInTest()" class="gradient-card p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 hover:border-rose-500 transition">
-                        <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center">
-                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-[10px] font-bold text-slate-200">Safety SOS</span>
-                    </button>
-                </div>
-
-                <div class="gradient-card p-4 rounded-3xl shadow-sm relative">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="p-2 bg-neonPink/20 text-neonPink rounded-xl border border-neonPink/30">
-                                <i data-lucide="package-check" class="w-4 h-4"></i>
-                            </div>
-                            <div>
-                                <span class="text-[10px] font-black uppercase text-neonPink tracking-wider">📦 SMART PICKUP</span>
-                                <h4 class="text-xs font-bold text-white">Library Printouts Request</h4>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-lg">On Your Path</span>
-                    </div>
-                    <p class="text-xs text-slate-300 mb-3">Someone is walking this route soon. Carry an errand along your path to earn +50 Wellness points!</p>
-                    <button onclick="acceptErrandRequest(1)" class="w-full gradient-brand text-white font-black text-xs py-2.5 rounded-xl shadow-neon-pink hover:opacity-95 transition flex items-center justify-center gap-1.5">
-                        <i data-lucide="package-plus" class="w-4 h-4"></i> ACCEPT PICKUP
-                    </button>
-                </div>
-
                 <div class="gradient-card p-4 rounded-3xl space-y-3">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Daily Wellness Summary</h3>
@@ -471,25 +430,34 @@
                 </div>
 
                 <div class="gradient-card p-4 rounded-3xl space-y-2">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Safety Check-in Protection</h3>
-                        <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Active Guard
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between pt-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-pink-950 border border-neonPink/50 flex items-center justify-center text-sm">🦉</div>
-                            <div>
-                                <span class="text-xs font-bold text-white block" id="home-emergency-contact-display">Sarah Rivera (Mom)</span>
-                                <span class="text-[9px] text-slate-400">Trusted Emergency Contact</span>
-                            </div>
-                        </div>
-                        <button onclick="triggerEmergencyCheckInTest()" class="text-[11px] bg-rose-950/80 border border-rose-500/40 text-rose-300 font-bold px-3 py-1.5 rounded-xl hover:bg-rose-900/80 transition">
-                            Test SOS
-                        </button>
-                    </div>
-                </div>
+    <div class="flex justify-between items-center">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Safety Check-in Protection</h3>
+        <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Active Guard
+        </span>
+    </div>
+    <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-pink-950 border border-neonPink/50 flex items-center justify-center text-sm">🦉</div>
+            <div>
+                <span class="text-xs font-bold text-white block" id="home-emergency-contact-display">Sarah Rivera (Mom)</span>
+                <span class="text-[9px] text-slate-400">Trusted Emergency Contact</span>
+            </div>
+        </div>
+         <button onclick="triggerEmergencyCheckInTest()" class="text-[11px] bg-rose-950/80 border border-rose-500/40 text-rose-300 font-bold px-3 py-1.5 rounded-xl hover:bg-rose-900/80 transition">
+        Test SOS
+    </button>
+</div>
+<button onclick="openSOSVoiceModal()" class="mt-1 w-full gradient-brand text-white font-black text-xs py-2.5 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+    <i data-lucide="mic" class="w-4 h-4"></i> Talk to Walking Companion
+</button>
+<a href="tel:4044133333" class="mt-1 w-full bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs py-2.5 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
+        <i data-lucide="phone-call" class="w-4 h-4"></i> CALL GSU POLICE (404-413-3333)
+    </a>
+    <button onclick="openFakeCallModal()" class="mt-1 w-full bg-white/10 border border-white/20 text-white font-bold text-xs py-2.5 rounded-xl hover:bg-white/20 transition flex items-center justify-center gap-2">
+        <i data-lucide="phone-incoming" class="w-4 h-4"></i> Fake Call (Exit a situation)
+    </button>
+</div>
             </section>
 
             <section id="tab-find" class="tab-content space-y-4">
@@ -537,6 +505,12 @@
                     <button onclick="setFilter('popular', event)" class="filter-btn bg-black/40 text-slate-300 border border-white/10 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">🔥 Group Walks</button>
                     <button onclick="setFilter('night', event)" class="filter-btn bg-black/40 text-slate-300 border border-white/10 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">🌙 Safe Night Route</button>
                 </div>
+
+                <button onclick="openReportModal()" class="w-full bg-amber-950/60 border border-amber-500/40 text-amber-300 font-bold text-xs py-2.5 rounded-2xl hover:bg-amber-900/60 transition flex items-center justify-center gap-2">
+                    <i data-lucide="flag" class="w-4 h-4"></i> Report an Unsafe Area
+                </button>
+
+                <div id="safety-reports-container" class="space-y-2"></div>
 
                 <div id="walks-container" class="space-y-3">
                     <!-- Dynamic walk cards inserted via JS -->
@@ -644,18 +618,21 @@
                     <span class="px-2.5 py-1 bg-sky-500/20 border border-sky-500/40 text-sky-300 rounded-xl text-xs font-bold">Live</span>
                 </div>
 
-                <div class="gradient-card p-3.5 rounded-3xl flex flex-col h-[360px] border border-neonPink/30 shadow-neon-purple justify-between">
-                    <!-- Chat Messages Header -->
+                <div id="conversation-list" class="hidden flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+
+<div class="gradient-card p-3.5 rounded-3xl flex flex-col h-[360px] border border-neonPink/30 shadow-neon-purple justify-between">
+    <!-- Chat Messages Header -->
                     <div class="flex items-center justify-between pb-2.5 border-b border-white/10 text-xs">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-sm">🌸</div>
-                            <div>
-                                <h4 class="font-bold text-white">Main Quad Evening Walkers</h4>
-                                <span class="text-[9px] text-emerald-400">4 members active</span>
-                            </div>
-                        </div>
-                        <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-slate-300">Encrypted</span>
-                    </div>
+    <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center text-sm" id="chat-header-avatar">🌸</div>
+        <div>
+            <h4 class="font-bold text-white" id="chat-header-name">Main Quad Evening Walkers</h4>
+            <span class="text-[9px] text-emerald-400" id="chat-header-status">4 members active</span>
+        </div>
+    </div>
+    <button id="chat-remove-btn" onclick="removeCurrentMatchedBuddy()" class="hidden text-[10px] bg-rose-950/80 border border-rose-500/40 text-rose-300 font-bold px-2 py-0.5 rounded-full hover:bg-rose-900/80 transition">Remove</button>
+    <span id="chat-encrypted-badge" class="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-slate-300">Encrypted</span>
+</div>
 
                     <!-- Message Feed -->
                     <div id="chat-messages-container" class="flex-1 overflow-y-auto no-scrollbar py-2 space-y-3 text-xs">
@@ -689,13 +666,18 @@
             </section>
 
                 <section id="tab-match" class="tab-content space-y-4">
-    <div class="pt-1">
-        <div class="flex items-center gap-1.5 text-neonPink font-bold text-xs">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>Buddy Match</span>
+    <div class="pt-1 flex justify-between items-start">
+        <div>
+            <div class="flex items-center gap-1.5 text-neonPink font-bold text-xs">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Buddy Match</span>
+            </div>
+            <h1 class="text-2xl font-black text-white">Find a Buddy</h1>
+            <p class="text-xs text-slate-400">Not a dating app — find someone to walk, study, or go to events with.</p>
         </div>
-        <h1 class="text-2xl font-black text-white">Find a Buddy</h1>
-        <p class="text-xs text-slate-400">Not a dating app — find someone to walk, study, or go to events with.</p>
+        <button onclick="switchTab('chat')" class="bg-sky-500/20 border border-sky-500/40 text-sky-300 p-2.5 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+        </button>
     </div>
 
     <div id="match-card-area" class="relative"></div>
@@ -748,14 +730,25 @@
                     </div>
 
                     <div class="gradient-card p-3.5 rounded-2xl space-y-2.5">
-                        <span class="text-xs font-bold text-neonPink flex items-center gap-1">
-                            <i data-lucide="shield" class="w-3.5 h-3.5"></i> Safety Controls
-                        </span>
+    <span class="text-xs font-bold text-neonPink flex items-center gap-1">
+        <i data-lucide="shield" class="w-3.5 h-3.5"></i> Safety Controls
+    </span>
 
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-300">Auto Check-in Timer & Ping</span>
-                            <input type="checkbox" id="check-safety-ping" checked class="accent-neonPink rounded">
-                        </div>
+    <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">Alert Emergency Contact If Not Arrived Within</label>
+        <select id="input-alert-timeout" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white">
+            <option value="30" selected>30 minutes (Recommended)</option>
+            <option value="60">1 hour</option>
+            <option value="90">1.5 hours</option>
+            <option value="120">2 hours</option>
+            <option value="180">3 hours</option>
+        </select>
+    </div>
+
+    <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-300">Auto Check-in Timer & Ping</span>
+        <input type="checkbox" id="check-safety-ping" checked class="accent-neonPink rounded">
+    </div>
 
                         <div class="flex justify-between items-center">
                             <span class="text-xs text-slate-300">Notify Emergency Contact on Departure</span>
@@ -905,7 +898,7 @@
             </section>
         </main>
 
-        <nav id="device-nav" class="hidden absolute bottom-0 left-0 right-0 bg-deepIndigo/95 backdrop-blur-md border-t border-white/10 px-4 py-2.5 justify-around items-center z-30">
+        <nav id="device-nav" class="hidden bg-deepIndigo/95 backdrop-blur-md border-t border-white/10 px-4 py-2.5 justify-around items-center flex-shrink-0">
     <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 text-neonPink font-extrabold transition">
         <i data-lucide="home" class="w-5 h-5"></i>
         <span class="text-[10px]">Home</span>
@@ -914,25 +907,21 @@
         <i data-lucide="users" class="w-5 h-5"></i>
         <span class="text-[10px] font-bold">Match</span>
     </button>
+    <button onclick="switchTab('create')" id="nav-create" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
+        <div class="gradient-brand text-white p-2.5 rounded-full -mt-6 shadow-neon-pink hover:scale-105 transition">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[10px] font-bold text-slate-400 mt-0.5">Walk</span>
+    </button>
     <button onclick="switchTab('find')" id="nav-find" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-neonPink transition">
-                <i data-lucide="map" class="w-5 h-5"></i>
-                <span class="text-[10px] font-bold">Find & Map</span>
-            </button>
-            <button onclick="switchTab('create')" id="nav-create" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition">
-                <div class="gradient-brand text-white p-2.5 rounded-full -mt-6 shadow-neon-pink hover:scale-105 transition">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                </div>
-                <span class="text-[10px] font-bold text-slate-400 mt-0.5">Walk</span>
-            </button>
-            <button onclick="switchTab('wellness')" id="nav-wellness" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-neonPink transition">
-                <i data-lucide="heart-pulse" class="w-5 h-5"></i>
-                <span class="text-[10px] font-bold">Wellness</span>
-            </button>
-            <button onclick="switchTab('chat')" id="nav-chat" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-neonPink transition">
-                <i data-lucide="message-circle" class="w-5 h-5"></i>
-                <span class="text-[10px] font-bold">Chat</span>
-            </button>
-        </nav>
+        <i data-lucide="map" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold">Find & Map</span>
+    </button>
+    <button onclick="switchTab('wellness')" id="nav-wellness" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-neonPink transition">
+        <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold">Wellness</span>
+    </button>
+</nav>
         </div>
     </div>
 
@@ -1061,6 +1050,115 @@
         </div>
     </div>
 
+    <!-- Fake Incoming Call Modal -->
+<div id="fake-call-modal" class="absolute inset-0 z-[60] bg-black opacity-0 pointer-events-none transition-all duration-300 flex flex-col">
+    <div id="fake-call-incoming" class="flex-1 flex flex-col items-center justify-between py-16 px-8 bg-gradient-to-b from-slate-900 to-black">
+        <div class="text-center space-y-2 mt-8">
+            <p class="text-slate-400 text-sm">Incoming Call</p>
+            <div class="w-28 h-28 rounded-full gradient-brand mx-auto flex items-center justify-center text-5xl shadow-neon-pink mt-4">🦉</div>
+            <h2 class="text-2xl font-black text-white mt-4" id="fake-call-name">Mom</h2>
+            <p class="text-slate-400 text-xs">mobile</p>
+        </div>
+        <div class="flex items-center justify-between w-full max-w-xs">
+            <button onclick="declineFakeCall()" class="w-16 h-16 rounded-full bg-rose-600 flex items-center justify-center shadow-lg active:scale-95 transition">
+                <i data-lucide="phone-off" class="w-6 h-6 text-white"></i>
+            </button>
+            <button onclick="answerFakeCall()" class="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg active:scale-95 transition pulse-emerald">
+                <i data-lucide="phone" class="w-6 h-6 text-white"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="fake-call-active" class="hidden flex-1 flex flex-col items-center justify-between py-16 px-8 bg-gradient-to-b from-slate-900 to-black">
+        <div class="text-center space-y-2 mt-8">
+            <div class="w-28 h-28 rounded-full gradient-brand mx-auto flex items-center justify-center text-5xl shadow-neon-pink">🦉</div>
+            <h2 class="text-2xl font-black text-white mt-4" id="fake-call-name-active">Mom</h2>
+            <p class="text-emerald-400 text-xs font-mono" id="fake-call-timer">00:00</p>
+        </div>
+        <button onclick="endFakeCall()" class="w-16 h-16 rounded-full bg-rose-600 flex items-center justify-center shadow-lg active:scale-95 transition">
+            <i data-lucide="phone-off" class="w-6 h-6 text-white"></i>
+        </button>
+    </div>
+</div>
+
+    <!-- Report Unsafe Area Modal -->
+<div id="report-modal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
+    <div class="gradient-card p-6 rounded-3xl w-full max-w-xs space-y-4 shadow-neon-purple border border-amber-500/50">
+        <div class="flex justify-between items-center">
+            <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="flag" class="w-4 h-4 text-amber-400"></i> Report Unsafe Area
+            </h3>
+            <button onclick="closeReportModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block font-bold text-slate-300 mb-1">Location</label>
+                <select id="report-location" class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white"></select>
+            </div>
+            <div>
+                <label class="block font-bold text-slate-300 mb-1">What happened?</label>
+                <select id="report-category" class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white">
+                    <option>Poor Lighting</option>
+                    <option>Catcalling / Harassment</option>
+                    <option>Suspicious Person</option>
+                    <option>Broken Emergency Phone</option>
+                    <option>Isolated / No Foot Traffic</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-bold text-slate-300 mb-1">Details (optional)</label>
+                <textarea id="report-notes" rows="2" placeholder="Anything else other women should know..." class="w-full bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-white resize-none"></textarea>
+            </div>
+            <p class="text-[10px] text-slate-400">Your report is anonymous and helps other women stay safe on campus.</p>
+
+            <button onclick="submitSafetyReport()" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black py-3 rounded-xl shadow-lg hover:opacity-95 transition mt-2">
+                SUBMIT REPORT
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- AI Walking Companion Modal -->
+<div id="sos-voice-modal" class="absolute inset-0 z-[60] bg-black/95 opacity-0 pointer-events-none transition-all duration-300 flex flex-col items-center justify-center p-6">
+    <button onclick="closeSOSVoiceModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+
+    <div id="companion-picker-screen" class="text-center space-y-5 w-full max-w-xs">
+        <div>
+            <div class="w-20 h-20 rounded-full gradient-brand mx-auto flex items-center justify-center shadow-neon-pink pulse-pink mb-3">
+                <i data-lucide="mic" class="w-8 h-8 text-white"></i>
+            </div>
+            <h2 class="text-xl font-black text-white">Choose Your Companion</h2>
+            <p class="text-xs text-slate-400">Who do you want to talk to on this walk?</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="startCompanionCall('friend')" class="gradient-card p-4 rounded-2xl space-y-2 hover:border-neonPink border border-white/10 transition flex flex-col items-center">
+                <span class="text-3xl">🦊</span>
+                <span class="text-xs font-bold text-white">Friend</span>
+                <span class="text-[9px] text-slate-400">Casual & fun</span>
+            </button>
+            <button onclick="startCompanionCall('grandma')" class="gradient-card p-4 rounded-2xl space-y-2 hover:border-neonPink border border-white/10 transition flex flex-col items-center">
+                <span class="text-3xl">👵</span>
+                <span class="text-xs font-bold text-white">Grandma</span>
+                <span class="text-[9px] text-slate-400">Warm & caring</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="companion-call-screen" class="hidden text-center space-y-2 w-full max-w-xs">
+        <div class="w-20 h-20 rounded-full gradient-brand mx-auto flex items-center justify-center shadow-neon-pink pulse-pink mb-3">
+            <span id="companion-call-emoji" class="text-3xl">🦊</span>
+        </div>
+        <h2 id="companion-call-title" class="text-xl font-black text-white">Friend</h2>
+        <p class="text-xs text-slate-400">Talk to me while you walk — I'm keeping you company.</p>
+        <div id="convai-widget-container" class="w-full mt-4"></div>
+        <p class="text-[10px] text-slate-500 mt-6">This does not replace calling 911 in a life-threatening emergency.</p>
+    </div>
+</div>
+
     <div id="mutual-match-modal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
     <div class="gradient-card p-6 rounded-3xl w-full max-w-xs space-y-4 shadow-neon-purple border border-neonPink/50 text-center">
         <div class="text-4xl">✨</div>
@@ -1068,12 +1166,21 @@
         <p class="text-xs text-slate-300" id="mutual-match-text">You and Maya have a lot in common.</p>
         <div class="flex flex-col gap-2 pt-2">
             <button onclick="planWalkWithMatch()" class="w-full gradient-brand text-white font-black py-3 rounded-xl shadow-neon-pink hover:opacity-95 transition">Plan a Walk</button>
-            <button onclick="closeMutualMatchModal()" class="w-full bg-white/10 border border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">Message Later</button>
+            <button onclick="openChatWithMatchedBuddy()" class="w-full bg-white/10 border border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/20 transition">Message Now</button>
         </div>
     </div>
 </div>
 
     <script>
+                function fitPhoneFrame() {
+            const frame = document.getElementById('phone-frame');
+            if (!frame) return;
+            const availableHeight = window.innerHeight - 24;
+            const scale = Math.min(1, availableHeight / 920);
+            frame.style.zoom = scale;
+        }
+        window.addEventListener('resize', fitPhoneFrame);
+        fitPhoneFrame();
                 const appState = {
             isLoggedIn: false,
             selectedLoginAvatar: '👩🏽',
@@ -1102,11 +1209,11 @@
             walks: [
                 {
                     id: 1,
-                    title: "Student Center → Library",
-                    from: "Student Center",
-                    to: "Library",
+                    title: "Student Center East → GSU Library",
+                    from: "Student Center East",
+                    to: "GSU Library",
                     time: "3:30 PM",
-                    distance: "1.2 mi",
+                    distance: "0.2 mi",
                     buddies: 3,
                     nightSafe: true,
                     joined: false,
@@ -1114,11 +1221,11 @@
                 },
                 {
                     id: 2,
-                    title: "North Campus Quad Loop",
-                    from: "Quad Plaza",
-                    to: "Science Hall",
+                    title: "CMII → Centennial Hall",
+                    from: "CMII",
+                    to: "Centennial Hall",
                     time: "4:15 PM",
-                    distance: "0.8 mi",
+                    distance: "0.3 mi",
                     buddies: 2,
                     nightSafe: true,
                     joined: false,
@@ -1126,15 +1233,27 @@
                 },
                 {
                     id: 3,
-                    title: "West Dorm Stroll",
-                    from: "West Housing",
-                    to: "Dining Hall",
+                    title: "Piedmont Dining Hall → 55 Park Place",
+                    from: "Piedmont Central Dining Hall",
+                    to: "55 Park Place (Andrew Young School)",
                     time: "5:00 PM",
-                    distance: "1.5 mi",
+                    distance: "0.4 mi",
                     buddies: 4,
                     nightSafe: false,
                     joined: false,
                     avatars: ["👩🏽", "👩🏼", "👩🏻", "👩🏾"]
+                },
+                {
+                    id: 4,
+                    title: "Law Library → Aderhold Learning Center",
+                    from: "Law Library",
+                    to: "Aderhold Learning Center",
+                    time: "6:30 PM",
+                    distance: "0.2 mi",
+                    buddies: 2,
+                    nightSafe: false,
+                    joined: false,
+                    avatars: ["👩🏻", "👩🏾"]
                 }
             ],
             errands: [
@@ -1159,7 +1278,11 @@
                     status: "Pending"
                 }
             ],
-            activeFilter: 'all'
+                        activeFilter: 'all',
+            safetyReports: [
+                { id: 1, locationName: "Aderhold Learning Center", category: "Poor Lighting", notes: "Very dark path near the park entrance at night.", time: "2 days ago" },
+                { id: 2, locationName: "Piedmont Central Dining Hall", category: "Isolated / No Foot Traffic", notes: "Quiet after 9PM, few people around.", time: "5 days ago" }
+            ]
         };
 
                 document.addEventListener('DOMContentLoaded', () => {
@@ -1170,6 +1293,7 @@
             renderWalkList();
             renderErrandList();
             renderMatchCard();
+            renderSafetyReports();
             updateClock();
             setInterval(updateClock, 30000);
         });
@@ -1253,17 +1377,35 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            const isAuthenticated = await auth0Client.isAuthenticated();
+             const isAuthenticated = await auth0Client.isAuthenticated();
             if (isAuthenticated) {
                 const authUser = await auth0Client.getUser();
                 appState.user.name = authUser.name || authUser.email.split('@')[0];
                 appState.user.email = authUser.email;
                 appState.user.isGsuVerified = true;
 
-                document.getElementById('auth-step-signin').classList.add('hidden');
-                document.getElementById('auth-step-profile').classList.remove('hidden');
-                document.getElementById('auth-verified-email').innerText = `Verified: ${authUser.email}`;
-                if (window.lucide) lucide.createIcons();
+                const savedProfile = localStorage.getItem('herbuddy-profile-' + authUser.email);
+                if (savedProfile) {
+                    const parsed = JSON.parse(savedProfile);
+                    appState.user.year = parsed.year;
+                    appState.user.major = parsed.major;
+                    appState.isLoggedIn = true;
+
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('device-header').classList.remove('hidden');
+                    document.getElementById('device-header').classList.add('flex');
+                    document.getElementById('device-nav').classList.remove('hidden');
+                    document.getElementById('device-nav').classList.add('flex');
+
+                    syncStateToUI();
+                    switchTab('home');
+                    showToast("Welcome back!", `Hey ${appState.user.name}!`);
+                } else {
+                    document.getElementById('auth-step-signin').classList.add('hidden');
+                    document.getElementById('auth-step-profile').classList.remove('hidden');
+                    document.getElementById('auth-verified-email').innerText = `Verified: ${authUser.email}`;
+                    if (window.lucide) lucide.createIcons();
+                }
             }
         }
 
@@ -1276,6 +1418,8 @@
             appState.user.year = document.getElementById('login-year').value;
             appState.user.major = document.getElementById('login-major').value;
             appState.isLoggedIn = true;
+
+            localStorage.setItem('herbuddy-profile-' + appState.user.email, JSON.stringify({ year: appState.user.year, major: appState.user.major }));
 
             document.getElementById('screen-login').classList.add('hidden');
             document.getElementById('device-header').classList.remove('hidden');
@@ -1432,28 +1576,36 @@
   }, 100);
 }
 
-        function handleSendChatMessage(e) {
+                function handleSendChatMessage(e) {
             if (e) e.preventDefault();
             const input = document.getElementById('chat-input-text');
             const msg = input.value.trim();
             if (!msg) return;
 
-            const container = document.getElementById('chat-messages-container');
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            container.innerHTML += `
-                <div class="flex items-start gap-2 justify-end">
-                    <div class="gradient-brand p-2.5 rounded-2xl rounded-tr-none text-white space-y-0.5 max-w-[80%] shadow-neon-pink">
-                        <span class="text-[9px] font-bold text-pink-200 block">You (${appState.user.name.split(' ')[0]} ${appState.user.avatar})</span>
-                        <p class="text-white">${escapeHtml(msg)}</p>
-                        <span class="text-[8px] text-white/70 block text-right">${timeStr}</span>
+            if (activeChatBuddy) {
+                const key = activeChatBuddy.name;
+                if (!chatHistories[key]) chatHistories[key] = [];
+                chatHistories[key].push({ fromUser: true, text: msg, time: timeStr });
+                renderActiveChatMessages();
+                showToast("Message Sent", `Sent to ${activeChatBuddy.name.split(' ')[0]}.`);
+            } else {
+                const container = document.getElementById('chat-messages-container');
+                container.innerHTML += `
+                    <div class="flex items-start gap-2 justify-end">
+                        <div class="gradient-brand p-2.5 rounded-2xl rounded-tr-none text-white space-y-0.5 max-w-[80%] shadow-neon-pink">
+                            <span class="text-[9px] font-bold text-pink-200 block">You (${appState.user.name.split(' ')[0]} ${appState.user.avatar})</span>
+                            <p class="text-white">${escapeHtml(msg)}</p>
+                            <span class="text-[8px] text-white/70 block text-right">${timeStr}</span>
+                        </div>
+                        <div class="w-6 h-6 rounded-full animal-avatar-box flex items-center justify-center text-xs flex-shrink-0 shadow">${appState.user.avatar}</div>
                     </div>
-                    <div class="w-6 h-6 rounded-full animal-avatar-box flex items-center justify-center text-xs flex-shrink-0 shadow">${appState.user.avatar}</div>
-                </div>
-            `;
+                `;
+                container.scrollTop = container.scrollHeight;
+                showToast("Message Sent", "Broadcast to your group study circle.");
+            }
             input.value = '';
-            container.scrollTop = container.scrollHeight;
-            showToast("Message Sent", "Broadcast to your group study circle.");
         }
 
         function escapeHtml(str) {
@@ -1581,12 +1733,16 @@
       return;
     }
 
+    const alertMinutes = parseInt(document.getElementById('input-alert-timeout').value) || 30;
+
     appState.activeWalk = {
       title: `${originLoc.name} → ${destLoc.name}`,
       from: originLoc.name,
       to: destLoc.name,
       distance: `${calcDistanceMiles(originLoc, destLoc)} miles`,
-      buddies: 3
+      buddies: 3,
+      alertMinutes: alertMinutes,
+      alertTriggered: false
     };
 
     startRealWalkTracking(originLoc, destLoc);
@@ -1598,7 +1754,7 @@
         }
 
         function quickJoinSuggestedRoute() {
-            appState.activeWalk = { title: "Student Center → Library", from: "Student Center", to: "Library", distance: "1.2 miles", buddies: 3 };
+            appState.activeWalk = { title: "Student Center → Library", from: "Student Center", to: "Library", distance: "1.2 miles", buddies: 3, alertMinutes: 30, alertTriggered: false };
             showActiveWalkBanner();
             showToast("Joined Walk Group!", "3 campus buddies notified. Safety check-in initiated.");
         }
@@ -1615,8 +1771,21 @@
                     const mins = Math.floor(appState.secondsElapsed / 60);
                     const secs = appState.secondsElapsed % 60;
                     document.getElementById('walk-timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                    const limitMinutes = (appState.activeWalk && appState.activeWalk.alertMinutes) || 30;
+                    if (appState.activeWalk && !appState.activeWalk.alertTriggered && appState.secondsElapsed >= limitMinutes * 60) {
+                        appState.activeWalk.alertTriggered = true;
+                        triggerLateArrivalAlert();
+                    }
                 }, 1000);
             }
+        }
+
+        function triggerLateArrivalAlert() {
+            playSnsAudioAlert();
+            const banner = document.getElementById('active-walk-banner');
+            banner.querySelector('div').classList.add('!from-rose-700', '!via-red-700', '!to-rose-800');
+            showToast("⚠️ Overdue Check-in!", `You haven't arrived yet. ${appState.user.contact} has been alerted automatically.`);
         }
 
         function triggerArrivalCheckIn() {
@@ -1656,6 +1825,104 @@
         function openNewErrandModal() {
             const modal = document.getElementById('errand-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+                function openReportModal() {
+            const select = document.getElementById('report-location');
+            select.innerHTML = gsuLocations.map(loc => `<option value="${loc.id}">${loc.emoji} ${loc.name}</option>`).join('');
+            document.getElementById('report-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeReportModal() {
+            document.getElementById('report-modal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+                    const companionPersonas = {
+            friend: { agentId: "agent_3901m2wq839wf26ayz3j3aevnv6h", label: "Friend", emoji: "🦊" },
+            grandma: { agentId: "agent_1801m2wp8ddyf2db2v2gmaz0033v", label: "Grandma", emoji: "👵" }
+        };
+
+        function openSOSVoiceModal() {
+            const modal = document.getElementById('sos-voice-modal');
+            document.getElementById('companion-picker-screen').classList.remove('hidden');
+            document.getElementById('companion-call-screen').classList.add('hidden');
+            document.getElementById('convai-widget-container').innerHTML = '';
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function startCompanionCall(personaKey) {
+            const persona = companionPersonas[personaKey];
+            const container = document.getElementById('convai-widget-container');
+
+            document.getElementById('companion-picker-screen').classList.add('hidden');
+            document.getElementById('companion-call-screen').classList.remove('hidden');
+            document.getElementById('companion-call-emoji').innerText = persona.emoji;
+            document.getElementById('companion-call-title').innerText = persona.label;
+
+            container.innerHTML = `<elevenlabs-convai agent-id="${persona.agentId}"></elevenlabs-convai>`;
+        }
+
+        function closeSOSVoiceModal() {
+            const modal = document.getElementById('sos-voice-modal');
+            document.getElementById('convai-widget-container').innerHTML = '';
+            modal.classList.add('opacity-0', 'pointer-events-none');
+
+        }
+
+        function submitSafetyReport() {
+            const locId = parseInt(document.getElementById('report-location').value);
+            const loc = gsuLocations.find(l => l.id === locId);
+            const category = document.getElementById('report-category').value;
+            const notes = document.getElementById('report-notes').value.trim();
+
+            if (!loc) return;
+
+            const report = {
+                id: Date.now(),
+                locationName: loc.name,
+                category,
+                notes: notes || "No additional details.",
+                time: "Just now",
+                lat: loc.lat,
+                lng: loc.lng
+            };
+            appState.safetyReports.unshift(report);
+
+            if (googleMap) {
+                new google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map: googleMap,
+                    label: { text: "⚠️", fontSize: "14px" },
+                    title: `${category} — ${loc.name}`
+                });
+            }
+
+            renderSafetyReports();
+            document.getElementById('report-notes').value = '';
+            closeReportModal();
+            showToast("Report Submitted", "Thank you for helping keep the community safe.");
+        }
+
+        function renderSafetyReports() {
+            const container = document.getElementById('safety-reports-container');
+            if (!container) return;
+            if (appState.safetyReports.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider pt-1">Community Safety Reports</h3>
+            ` + appState.safetyReports.slice(0, 5).map(r => `
+                <div class="bg-amber-950/30 border border-amber-500/20 p-3 rounded-2xl text-xs space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-amber-300">⚠️ ${r.category}</span>
+                        <span class="text-[10px] text-slate-500">${r.time}</span>
+                    </div>
+                    <p class="text-slate-300">${r.locationName}</p>
+                    <p class="text-[11px] text-slate-400">${escapeHtml(r.notes)}</p>
+                </div>
+            `).join('');
         }
 
         function closeNewErrandModal() {
@@ -1752,218 +2019,475 @@
                     osc1.stop(startTime + 0.38);
                     osc2.stop(startTime + 0.38);
                 }
-            } catch (err) {
+             } catch (err) {
                 console.warn("AudioContext note playback blocked or not supported", err);
             }
         }
 
-        function showToast(title, msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-message').innerText = msg;
+        let fakeCallRingInterval = null;
+            let fakeCallTimerInterval = null;
+            let fakeCallSeconds = 0;
 
-            toast.classList.remove('-translate-y-28', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+            function openFakeCallModal() {
+                const modal = document.getElementById('fake-call-modal');
+                document.getElementById('fake-call-incoming').classList.remove('hidden');
+                document.getElementById('fake-call-active').classList.add('hidden');
+                document.getElementById('fake-call-name').innerText = appState.user.contact.split('(')[0].trim() || 'Mom';
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                if (window.lucide) lucide.createIcons();
 
-            setTimeout(() => { hideToast(); }, 3500);
-        }
+                fakeCallRingInterval = setInterval(() => {
+                    try {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioContext) return;
+                        const ctx = new AudioContext();
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, ctx.currentTime);
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 0.8);
+                    } catch (e) {
+                    }
+                }, 1800);
+            }
 
-        function hideToast() {
-            const toast = document.getElementById('toast');
-            toast.classList.remove('translate-y-0', 'opacity-100');
-            toast.classList.add('-translate-y-28', 'opacity-0');
-        }
-        // === GOOGLE MAPS INTEGRATION ===
-        const GSU_CENTER = { lat: 33.7529, lng: -84.3856 };
+            function declineFakeCall() {
+                clearInterval(fakeCallRingInterval);
+                document.getElementById('fake-call-modal').classList.add('opacity-0', 'pointer-events-none');
+            }
 
-        const gsuLocations = [
-  { id: 1, name: "GSU Library", category: "study", emoji: "📚", lat: 33.7528152, lng: -84.3865632, floors: "4th Floor, 5th Floor, Study Commons (open till 2AM), private rooms (by reservation)", safetyNote: "Open till 11PM • 24/7 security" },
-  { id: 2, name: "GSU Library South", category: "reading", emoji: "📖", lat: 33.7522861, lng: -84.3869648, floors: "Quiet reading floor", safetyNote: "Staffed help desk on-site" },
-  { id: 3, name: "Student Center East", category: "social", emoji: "💬", lat: 33.7526653, lng: -84.3849037, floors: null, safetyNote: "High foot traffic • Campus police nearby" },
-  { id: 4, name: "Piedmont Central Dining Hall", category: "food", emoji: "🍽️", lat: 33.7569173, lng: -84.3824292, floors: null, safetyNote: "Open 24/7 • Always staffed" },
-  { id: 5, name: "55 Park Place (Andrew Young School)", category: "study", emoji: "📚", lat: 33.7560817, lng: -84.3874448, floors: "11th Floor, 12th Floor (nice view, quiet)", safetyNote: "Closes 5:15PM • Lobby security" },
-  { id: 6, name: "Centennial Hall", category: "study", emoji: "📚", lat: 33.7558673, lng: -84.3837997, floors: "2nd Floor (Honors College)", safetyNote: "Closes 5PM • Central campus, busy area" },
-  { id: 7, name: "Law Library", category: "study", emoji: "📚", lat: 33.7567693, lng: -84.3872065, floors: "3rd Floor, 5th Floor, 6th Floor", safetyNote: "Closes 5PM • ID required to enter" },
-  { id: 8, name: "CMII (Creative Media Industries Institute)", category: "study", emoji: "📚", lat: 33.7547724, lng: -84.3881646, floors: "2nd Floor", safetyNote: "Open till 10PM • Staff on-site" },
-  { id: 9, name: "Aderhold Learning Center", category: "study", emoji: "📚", lat: 33.7564148, lng: -84.388812, floors: "Concourse (Ground Floor)", safetyNote: "⚠️ Farther from central campus, near the park — go with a group at night" }
-];
+            function answerFakeCall() {
+                clearInterval(fakeCallRingInterval);
+                document.getElementById('fake-call-incoming').classList.add('hidden');
+                document.getElementById('fake-call-active').classList.remove('hidden');
+                document.getElementById('fake-call-name-active').innerText = appState.user.contact.split('(')[0].trim() || 'Mom';
+                fakeCallSeconds = 0;
+                fakeCallTimerInterval = setInterval(() => {
+                    fakeCallSeconds++;
+                    const m = Math.floor(fakeCallSeconds / 60).toString().padStart(2, '0');
+                    const s = (fakeCallSeconds % 60).toString().padStart(2, '0');
+                    document.getElementById('fake-call-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            }
 
-        let googleMap = null;
-        let userMarker = null;
-        let walkRouteCoords = [];
-        let walkAnimationInterval = null;
-        let activeWalkPolyline = null;
-
-        function initMap() {
-          googleMap = new google.maps.Map(document.getElementById("google-map"), {
-            center: GSU_CENTER,
-            zoom: 16,
-            disableDefaultUI: true,
-            styles: [
-              { elementType: "geometry", stylers: [{ color: "#1a0533" }] },
-              { elementType: "labels.text.stroke", stylers: [{ color: "#1a0533" }] },
-              { elementType: "labels.text.fill", stylers: [{ color: "#e0d7ff" }] }
-            ]
-          });
-
-          gsuLocations.forEach(loc => {
-    const marker = new google.maps.Marker({
-      position: { lat: loc.lat, lng: loc.lng },
-      map: googleMap,
-      label: { text: loc.emoji, fontSize: "16px" },
-      title: loc.name
-    });
+            function endFakeCall() {
+                clearInterval(fakeCallTimerInterval);
+                document.getElementById('fake-call-modal').classList.add('opacity-0', 'pointer-events-none');
+            }
 
 
-    const floorsLine = loc.floors ? `<div style="font-size:11px; margin-top:2px;">${loc.floors}</div>` : "";
+            function showToast(title, msg) {
+                const toast = document.getElementById('toast');
+                document.getElementById('toast-title').innerText = title;
+                document.getElementById('toast-message').innerText = msg;
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `<div style="color:#1a0533; font-family: sans-serif; max-width:200px;">
+                toast.classList.remove('-translate-y-28', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+
+                setTimeout(() => {
+                    hideToast();
+                }, 3500);
+            }
+
+            function hideToast() {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-28', 'opacity-0');
+            }
+
+            // === GOOGLE MAPS INTEGRATION ===
+            const GSU_CENTER = {lat: 33.7529, lng: -84.3856};
+
+            const gsuLocations = [
+                {
+                    id: 1,
+                    name: "GSU Library",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7528152,
+                    lng: -84.3865632,
+                    floors: "4th Floor, 5th Floor, Study Commons (open till 2AM), private rooms (by reservation)",
+                    safetyNote: "Open till 11PM • 24/7 security"
+                },
+                {
+                    id: 2,
+                    name: "GSU Library South",
+                    category: "reading",
+                    emoji: "📖",
+                    lat: 33.7522861,
+                    lng: -84.3869648,
+                    floors: "Quiet reading floor",
+                    safetyNote: "Staffed help desk on-site"
+                },
+                {
+                    id: 3,
+                    name: "Student Center East",
+                    category: "social",
+                    emoji: "💬",
+                    lat: 33.7526653,
+                    lng: -84.3849037,
+                    floors: null,
+                    safetyNote: "High foot traffic • Campus police nearby"
+                },
+                {
+                    id: 4,
+                    name: "Piedmont Central Dining Hall",
+                    category: "food",
+                    emoji: "🍽️",
+                    lat: 33.7569173,
+                    lng: -84.3824292,
+                    floors: null,
+                    safetyNote: "Open 24/7 • Always staffed"
+                },
+                {
+                    id: 5,
+                    name: "55 Park Place (Andrew Young School)",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7560817,
+                    lng: -84.3874448,
+                    floors: "11th Floor, 12th Floor (nice view, quiet)",
+                    safetyNote: "Closes 5:15PM • Lobby security"
+                },
+                {
+                    id: 6,
+                    name: "Centennial Hall",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7558673,
+                    lng: -84.3837997,
+                    floors: "2nd Floor (Honors College)",
+                    safetyNote: "Closes 5PM • Central campus, busy area"
+                },
+                {
+                    id: 7,
+                    name: "Law Library",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7567693,
+                    lng: -84.3872065,
+                    floors: "3rd Floor, 5th Floor, 6th Floor",
+                    safetyNote: "Closes 5PM • ID required to enter"
+                },
+                {
+                    id: 8,
+                    name: "CMII (Creative Media Industries Institute)",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7547724,
+                    lng: -84.3881646,
+                    floors: "2nd Floor",
+                    safetyNote: "Open till 10PM • Staff on-site"
+                },
+                {
+                    id: 9,
+                    name: "Aderhold Learning Center",
+                    category: "study",
+                    emoji: "📚",
+                    lat: 33.7564148,
+                    lng: -84.388812,
+                    floors: "Concourse (Ground Floor)",
+                    safetyNote: "⚠️ Farther from central campus, near the park — go with a group at night"
+                }
+            ];
+
+            let googleMap = null;
+            let userMarker = null;
+            let walkRouteCoords = [];
+            let walkAnimationInterval = null;
+            let activeWalkPolyline = null;
+
+            function initMap() {
+                googleMap = new google.maps.Map(document.getElementById("google-map"), {
+                    center: GSU_CENTER,
+                    zoom: 16,
+                    disableDefaultUI: true,
+                    styles: [
+                        {elementType: "geometry", stylers: [{color: "#1a0533"}]},
+                        {elementType: "labels.text.stroke", stylers: [{color: "#1a0533"}]},
+                        {elementType: "labels.text.fill", stylers: [{color: "#e0d7ff"}]}
+                    ]
+                });
+
+                gsuLocations.forEach(loc => {
+                    const marker = new google.maps.Marker({
+                        position: {lat: loc.lat, lng: loc.lng},
+                        map: googleMap,
+                        label: {text: loc.emoji, fontSize: "16px"},
+                        title: loc.name
+                    });
+
+
+                    const floorsLine = loc.floors ? `<div style="font-size:11px; margin-top:2px;">${loc.floors}</div>` : "";
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="color:#1a0533; font-family: sans-serif; max-width:200px;">
         <strong>${loc.emoji} ${loc.name}</strong>
         ${floorsLine}
         <div style="font-size:11px; color:#7B2CBF; margin-top:4px;">${loc.safetyNote}</div>
       </div>`
-    });
+                    });
 
-    marker.addListener("click", () => infoWindow.open(googleMap, marker));
-  });
-    populateLocationSelects();
-        }
-        function populateLocationSelects() {
-  const originSelect = document.getElementById('input-origin');
-  const destSelect = document.getElementById('input-destination');
-  if (!originSelect || !destSelect) return;
+                    marker.addListener("click", () => infoWindow.open(googleMap, marker));
+                });
+                populateLocationSelects();
+            }
 
-  const optionsHtml = gsuLocations.map(loc => `<option value="${loc.id}">${loc.emoji} ${loc.name}</option>`).join('');
-  originSelect.innerHTML = optionsHtml;
-  destSelect.innerHTML = optionsHtml;
+            function populateLocationSelects() {
+                const originSelect = document.getElementById('input-origin');
+                const destSelect = document.getElementById('input-destination');
+                if (!originSelect || !destSelect) return;
 
-  originSelect.value = 3;
-  destSelect.value = 1;
-  updateRouteEstimate();
-}
+                const optionsHtml = gsuLocations.map(loc => `<option value="${loc.id}">${loc.emoji} ${loc.name}</option>`).join('');
+                originSelect.innerHTML = optionsHtml;
+                destSelect.innerHTML = optionsHtml;
 
-function calcDistanceMiles(a, b) {
-  const R = 3958.8;
-  const dLat = (b.lat - a.lat) * Math.PI / 180;
-  const dLng = (b.lng - a.lng) * Math.PI / 180;
-  const lat1 = a.lat * Math.PI / 180;
-  const lat2 = b.lat * Math.PI / 180;
-  const x = Math.sin(dLat/2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) ** 2;
-  const d = 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
-  return d.toFixed(1);
-}
-function updateRouteEstimate() {
-  const originId = parseInt(document.getElementById('input-origin').value);
-  const destId = parseInt(document.getElementById('input-destination').value);
-  const originLoc = gsuLocations.find(l => l.id === originId);
-  const destLoc = gsuLocations.find(l => l.id === destId);
-  if (!originLoc || !destLoc) return;
+                originSelect.value = 3;
+                destSelect.value = 1;
+                updateRouteEstimate();
+            }
 
-  const miles = calcDistanceMiles(originLoc, destLoc);
-  const estMinutes = Math.max(3, Math.round(miles * 20));
-  document.getElementById('input-distance').value = `${miles} miles (${estMinutes} min)`;
+            function calcDistanceMiles(a, b) {
+                const R = 3958.8;
+                const dLat = (b.lat - a.lat) * Math.PI / 180;
+                const dLng = (b.lng - a.lng) * Math.PI / 180;
+                const lat1 = a.lat * Math.PI / 180;
+                const lat2 = b.lat * Math.PI / 180;
+                const x = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+                const d = 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+                return d.toFixed(1);
+            }
 
-  const timeInput = document.getElementById('input-time');
-  if (timeInput && !timeInput.dataset.userEdited) {
-    const now = new Date();
-    const hh = now.getHours().toString().padStart(2, '0');
-    const mm = now.getMinutes().toString().padStart(2, '0');
-    timeInput.value = `${hh}:${mm}`;
-  }
-}
+            let directionsService = null;
 
-function startRealWalkTracking(originLoc, destLoc) {
-  if (!googleMap) return;
+            function updateRouteEstimate() {
+                const originId = parseInt(document.getElementById('input-origin').value);
+                const destId = parseInt(document.getElementById('input-destination').value);
+                const originLoc = gsuLocations.find(l => l.id === originId);
+                const destLoc = gsuLocations.find(l => l.id === destId);
+                if (!originLoc || !destLoc) return;
 
-  walkRouteCoords = [
-    { lat: originLoc.lat, lng: originLoc.lng },
-    { lat: destLoc.lat, lng: destLoc.lng }
-  ];
+                document.getElementById('input-distance').value = "Calculating...";
 
-  if (activeWalkPolyline) activeWalkPolyline.setMap(null);
-  activeWalkPolyline = new google.maps.Polyline({
-    path: walkRouteCoords,
-    geodesic: true,
-    strokeColor: "#FF2E93",
-    strokeOpacity: 0.9,
-    strokeWeight: 4,
-    map: googleMap
-  });
+                if (!directionsService && window.google) {
+                    directionsService = new google.maps.DirectionsService();
+                }
 
-  if (userMarker) userMarker.setMap(null);
-  userMarker = new google.maps.Marker({
-    position: walkRouteCoords[0],
-    map: googleMap,
-    label: { text: "🦊", fontSize: "18px" },
-    title: "You"
-  });
+                if (directionsService) {
+                    directionsService.route({
+                        origin: {lat: originLoc.lat, lng: originLoc.lng},
+                        destination: {lat: destLoc.lat, lng: destLoc.lng},
+                        travelMode: google.maps.TravelMode.WALKING
+                    }, (result, status) => {
+                        if (status === "OK") {
+                            const leg = result.routes[0].legs[0];
+                            document.getElementById('input-distance').value = `${leg.distance.text} (${leg.duration.text})`;
+                        } else {
+                            applyFallbackEstimate(originLoc, destLoc);
+                        }
+                    });
+                } else {
+                    applyFallbackEstimate(originLoc, destLoc);
+                }
 
-  appState.activeWalk.destinationName = destLoc.name;
+                const timeInput = document.getElementById('input-time');
+                if (timeInput && !timeInput.dataset.userEdited) {
+                    const now = new Date();
+                    const hh = now.getHours().toString().padStart(2, '0');
+                    const mm = now.getMinutes().toString().padStart(2, '0');
+                    timeInput.value = `${hh}:${mm}`;
+                }
+            }
 
-  if (walkAnimationInterval) clearInterval(walkAnimationInterval);const distMiles = parseFloat(calcDistanceMiles(originLoc, destLoc));
-  let step = 0;
-  const totalSteps = Math.max(60, Math.round(distMiles * 400));
+            function applyFallbackEstimate(originLoc, destLoc) {
+                const miles = calcDistanceMiles(originLoc, destLoc);
+                const estMinutes = Math.max(3, Math.round(miles * 28));
+                document.getElementById('input-distance').value = `~${miles} miles (${estMinutes} min)`;
+            }
 
-  walkAnimationInterval = setInterval(() => {
-    step++;
-    const progress = step / totalSteps;
+            function startRealWalkTracking(originLoc, destLoc) {
+                if (!googleMap) return;
 
-            if (progress >= 1) {
-      userMarker.setPosition(walkRouteCoords[1]);
-      googleMap.panTo(walkRouteCoords[1]);
-      clearInterval(walkAnimationInterval);
-      walkAnimationInterval = null;
-      return;
-    }
+                walkRouteCoords = [
+                    {lat: originLoc.lat, lng: originLoc.lng},
+                    {lat: destLoc.lat, lng: destLoc.lng}
+                ];
 
-    const lat = walkRouteCoords[0].lat + (walkRouteCoords[1].lat - walkRouteCoords[0].lat) * progress;
-    const lng = walkRouteCoords[0].lng + (walkRouteCoords[1].lng - walkRouteCoords[0].lng) * progress;
-    userMarker.setPosition({ lat, lng });
-    googleMap.panTo({ lat, lng });
-  }, 150);
-}
+                if (activeWalkPolyline) activeWalkPolyline.setMap(null);
+                activeWalkPolyline = new google.maps.Polyline({
+                    path: walkRouteCoords,
+                    geodesic: true,
+                    strokeColor: "#FF2E93",
+                    strokeOpacity: 0.9,
+                    strokeWeight: 4,
+                    map: googleMap
+                });
 
-        const buddyProfiles = [
-            { name: "Maya Chen", avatar: "🦉", year: "Sophomore", major: "Computer Information Systems", interests: ["Coffee","Tech","K-pop","Gym"], clubs: ["ACM-W","Women in Technology","Data Science Club"], events: ["Career Fair","HackHERS","Women in Tech Mixer"], zone: "Library Area", lookingFor: ["Walking Buddy","Study Buddy"], walkingStyle: "Social", likedYou: true },
-            { name: "Sarah Kim", avatar: "🐰", year: "Sophomore", major: "Data Science", interests: ["Tech","Coffee","Yoga"], clubs: ["ACM-W"], events: ["Career Fair","Women in Tech Mixer"], zone: "Student Center Area", lookingFor: ["Event Buddy"], walkingStyle: "Social", likedYou: true },
-            { name: "Emily Torres", avatar: "🐱", year: "Junior", major: "Psychology", interests: ["Reading","Art","Coffee"], clubs: ["Psych Club"], events: ["HackHERS"], zone: "Aderhold Area", lookingFor: ["Study Buddy"], walkingStyle: "Casual", likedYou: false },
-            { name: "Jasmine Lee", avatar: "🦊", year: "Freshman", major: "Business Administration", interests: ["Fitness","Music","Coffee"], clubs: ["Women in Business"], events: ["Career Fair"], zone: "Recreation Center Area", lookingFor: ["Walking Buddy"], walkingStyle: "Social", likedYou: false },
-            { name: "Chloe Nguyen", avatar: "🦉", year: "Senior", major: "Computer Science", interests: ["Tech","Gaming","K-pop"], clubs: ["ACM-W","Data Science Club"], events: ["HackHERS","Career Fair"], zone: "Downtown Campus", lookingFor: ["Event Buddy","Study Buddy"], walkingStyle: "Social", likedYou: true }
-        ];
+                if (userMarker) userMarker.setMap(null);
+                userMarker = new google.maps.Marker({
+                    position: walkRouteCoords[0],
+                    map: googleMap,
+                    label: {text: "🦊", fontSize: "18px"},
+                    title: "You"
+                });
 
-        let currentMatchIndex = 0;
+                appState.activeWalk.destinationName = destLoc.name;
 
-        function calcBuddyMatch(user, buddy) {
-            let score = 0;
-            const reasons = [];
+                if (walkAnimationInterval) clearInterval(walkAnimationInterval);
+                const distMiles = parseFloat(calcDistanceMiles(originLoc, destLoc));
+                let step = 0;
+                const totalSteps = Math.max(60, Math.round(distMiles * 400));
 
-            if (user.year === buddy.year) { score += 10; reasons.push("Same year"); }
-            if (user.major === buddy.major) { score += 15; reasons.push("Same major"); }
-            else if (buddy.major.toLowerCase().includes("computer") || buddy.major.toLowerCase().includes("data")) { score += 8; reasons.push("Similar field of study"); }
+                walkAnimationInterval = setInterval(() => {
+                    step++;
+                    const progress = step / totalSteps;
 
-            const sharedInterests = user.interests.filter(i => buddy.interests.includes(i));
-            sharedInterests.forEach(i => { score += 10; reasons.push(`Both like ${i}`); });
+                    if (progress >= 1) {
+                        userMarker.setPosition(walkRouteCoords[1]);
+                        googleMap.panTo(walkRouteCoords[1]);
+                        clearInterval(walkAnimationInterval);
+                        walkAnimationInterval = null;
+                        return;
+                    }
 
-            const sharedClubs = user.clubs.filter(c => buddy.clubs.includes(c));
-            sharedClubs.forEach(c => { score += 15; reasons.push(`Both in ${c}`); });
+                    const lat = walkRouteCoords[0].lat + (walkRouteCoords[1].lat - walkRouteCoords[0].lat) * progress;
+                    const lng = walkRouteCoords[0].lng + (walkRouteCoords[1].lng - walkRouteCoords[0].lng) * progress;
+                    userMarker.setPosition({lat, lng});
+                    googleMap.panTo({lat, lng});
+                }, 150);
+            }
 
-            const sharedEvents = user.events.filter(e => buddy.events.includes(e));
-            sharedEvents.forEach(e => { score += 20; reasons.push(`Both interested in ${e}`); });
+            const buddyProfiles = [
+                {
+                    name: "Maya Chen",
+                    avatar: "🦉",
+                    year: "Sophomore",
+                    major: "Computer Information Systems",
+                    interests: ["Coffee", "Tech", "K-pop", "Gym"],
+                    clubs: ["ACM-W", "Women in Technology", "Data Science Club"],
+                    events: ["Career Fair", "HackHERS", "Women in Tech Mixer"],
+                    zone: "Library Area",
+                    lookingFor: ["Walking Buddy", "Study Buddy"],
+                    walkingStyle: "Social",
+                    likedYou: true
+                },
+                {
+                    name: "Sarah Kim",
+                    avatar: "🐰",
+                    year: "Sophomore",
+                    major: "Data Science",
+                    interests: ["Tech", "Coffee", "Yoga"],
+                    clubs: ["ACM-W"],
+                    events: ["Career Fair", "Women in Tech Mixer"],
+                    zone: "Student Center Area",
+                    lookingFor: ["Event Buddy"],
+                    walkingStyle: "Social",
+                    likedYou: true
+                },
+                {
+                    name: "Emily Torres",
+                    avatar: "🐱",
+                    year: "Junior",
+                    major: "Psychology",
+                    interests: ["Reading", "Art", "Coffee"],
+                    clubs: ["Psych Club"],
+                    events: ["HackHERS"],
+                    zone: "Aderhold Area",
+                    lookingFor: ["Study Buddy"],
+                    walkingStyle: "Casual",
+                    likedYou: true
+                },
+                {
+                    name: "Jasmine Lee",
+                    avatar: "🦊",
+                    year: "Freshman",
+                    major: "Business Administration",
+                    interests: ["Fitness", "Music", "Coffee"],
+                    clubs: ["Women in Business"],
+                    events: ["Career Fair"],
+                    zone: "Recreation Center Area",
+                    lookingFor: ["Walking Buddy"],
+                    walkingStyle: "Social",
+                    likedYou: true
+                },
+                {
+                    name: "Chloe Nguyen",
+                    avatar: "🦉",
+                    year: "Senior",
+                    major: "Computer Science",
+                    interests: ["Tech", "Gaming", "K-pop"],
+                    clubs: ["ACM-W", "Data Science Club"],
+                    events: ["HackHERS", "Career Fair"],
+                    zone: "Downtown Campus",
+                    lookingFor: ["Event Buddy", "Study Buddy"],
+                    walkingStyle: "Social",
+                    likedYou: true
+                }
+            ];
 
-            if (user.zone === buddy.zone) { score += 15; reasons.push("Same campus zone"); }
-            if (user.walkingStyle === buddy.walkingStyle) { score += 10; reasons.push(`Both prefer ${buddy.walkingStyle.toLowerCase()} walks`); }
+            let currentMatchIndex = 0;
+            let activeChatBuddy = null;
+            let matchedBuddies = [];
+            let chatHistories = {};
 
-            const percent = Math.min(98, Math.max(35, score));
-            return { percent, reasons };
-        }
+            function calcBuddyMatch(user, buddy) {
+                let score = 0;
+                const reasons = [];
 
-        function renderMatchCard() {
-            const area = document.getElementById('match-card-area');
-            if (!area) return;
+                if (user.year === buddy.year) {
+                    score += 10;
+                    reasons.push("Same year");
+                }
+                if (user.major === buddy.major) {
+                    score += 15;
+                    reasons.push("Same major");
+                } else if (buddy.major.toLowerCase().includes("computer") || buddy.major.toLowerCase().includes("data")) {
+                    score += 8;
+                    reasons.push("Similar field of study");
+                }
 
-            if (currentMatchIndex >= buddyProfiles.length) {
-                area.innerHTML = `
+                const sharedInterests = user.interests.filter(i => buddy.interests.includes(i));
+                sharedInterests.forEach(i => {
+                    score += 10;
+                    reasons.push(`Both like ${i}`);
+                });
+
+                const sharedClubs = user.clubs.filter(c => buddy.clubs.includes(c));
+                sharedClubs.forEach(c => {
+                    score += 15;
+                    reasons.push(`Both in ${c}`);
+                });
+
+                const sharedEvents = user.events.filter(e => buddy.events.includes(e));
+                sharedEvents.forEach(e => {
+                    score += 20;
+                    reasons.push(`Both interested in ${e}`);
+                });
+
+                if (user.zone === buddy.zone) {
+                    score += 15;
+                    reasons.push("Same campus zone");
+                }
+                if (user.walkingStyle === buddy.walkingStyle) {
+                    score += 10;
+                    reasons.push(`Both prefer ${buddy.walkingStyle.toLowerCase()} walks`);
+                }
+
+                const percent = Math.min(98, Math.max(35, score));
+                return {percent, reasons};
+            }
+
+            function renderMatchCard() {
+                const area = document.getElementById('match-card-area');
+                if (!area) return;
+
+                if (currentMatchIndex >= buddyProfiles.length) {
+                    area.innerHTML = `
                     <div class="gradient-card p-8 rounded-3xl text-center space-y-2">
                         <i data-lucide="users" class="w-8 h-8 text-neonPink mx-auto"></i>
                         <p class="text-sm font-bold text-white">No more profiles right now</p>
@@ -1971,14 +2495,14 @@ function startRealWalkTracking(originLoc, destLoc) {
                         <button onclick="currentMatchIndex = 0; renderMatchCard();" class="text-xs font-bold text-neonPink hover:underline mt-2">Start Over</button>
                     </div>
                 `;
-                if (window.lucide) lucide.createIcons();
-                return;
-            }
+                    if (window.lucide) lucide.createIcons();
+                    return;
+                }
 
-            const buddy = buddyProfiles[currentMatchIndex];
-            const { percent, reasons } = calcBuddyMatch(appState.user, buddy);
+                const buddy = buddyProfiles[currentMatchIndex];
+                const {percent, reasons} = calcBuddyMatch(appState.user, buddy);
 
-            area.innerHTML = `
+                area.innerHTML = `
                 <div class="gradient-card p-5 rounded-3xl shadow-neon-purple border border-neonPink/30 space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="w-16 h-16 rounded-2xl animal-avatar-box flex items-center justify-center text-3xl">${buddy.avatar}</div>
@@ -2029,45 +2553,164 @@ function startRealWalkTracking(originLoc, destLoc) {
                     </div>
                 </div>
             `;
-            if (window.lucide) lucide.createIcons();
-        }
+                if (window.lucide) lucide.createIcons();
+            }
 
-        function skipBuddy() {
-            currentMatchIndex++;
-            renderMatchCard();
-        }
-
-        function connectWithBuddy() {
-            const buddy = buddyProfiles[currentMatchIndex];
-            if (!buddy) return;
-
-            if (buddy.likedYou) {
-                const { reasons } = calcBuddyMatch(appState.user, buddy);
-                document.getElementById('mutual-match-text').innerHTML = `You and ${buddy.name.split(' ')[0]} have a lot in common.<br><br>${reasons.slice(0, 3).map(r => `✓ ${r}`).join('<br>')}`;
-                document.getElementById('mutual-match-modal').dataset.buddyName = buddy.name;
-                openMutualMatchModal();
-            } else {
-                showToast("Buddy Request Sent!", `${buddy.name} will be notified. You'll see them here if they connect back.`);
+            function skipBuddy() {
                 currentMatchIndex++;
                 renderMatchCard();
             }
-        }
 
-        function openMutualMatchModal() {
-            document.getElementById('mutual-match-modal').classList.remove('opacity-0', 'pointer-events-none');
-        }
+            function connectWithBuddy() {
+                const buddy = buddyProfiles[currentMatchIndex];
+                if (!buddy) return;
 
-        function closeMutualMatchModal() {
-            document.getElementById('mutual-match-modal').classList.add('opacity-0', 'pointer-events-none');
-            currentMatchIndex++;
-            renderMatchCard();
-        }
+                if (buddy.likedYou) {
+                    const alreadyMatched = matchedBuddies.find(b => b.name === buddy.name);
+                    if (!alreadyMatched && matchedBuddies.length >= 5) {
+                        showToast("Buddy Limit Reached", "You can only match with 5 buddies at once. Remove an old chat to match with someone new.");
+                        currentMatchIndex++;
+                        renderMatchCard();
+                        return;
+                    }
 
-        function planWalkWithMatch() {
-            closeMutualMatchModal();
-            showToast("Let's Plan a Walk!", "Pick your route and meeting point below.");
-            switchTab('create');
-        }
+                    if (!alreadyMatched) {
+                        matchedBuddies.push(buddy);
+                    }
+                    if (!chatHistories[buddy.name]) {
+                        chatHistories[buddy.name] = [
+                            {fromUser: false, text: "Hey! Excited to be your buddy 😊", time: "Just now"}
+                        ];
+                    }
+
+                    const {reasons} = calcBuddyMatch(appState.user, buddy);
+                    document.getElementById('mutual-match-text').innerHTML = `You and ${buddy.name.split(' ')[0]} have a lot in common.<br><br>${reasons.slice(0, 3).map(r => `✓ ${r}`).join('<br>')}`;
+                    document.getElementById('mutual-match-modal').dataset.buddyName = buddy.name;
+                    openMutualMatchModal();
+                } else {
+                    showToast("Buddy Request Sent!", `${buddy.name} will be notified. You'll see them here if they connect back.`);
+                    currentMatchIndex++;
+                    renderMatchCard();
+                }
+            }
+
+            function openMutualMatchModal() {
+                document.getElementById('mutual-match-modal').classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            function closeMutualMatchModal() {
+                document.getElementById('mutual-match-modal').classList.add('opacity-0', 'pointer-events-none');
+                currentMatchIndex++;
+                renderMatchCard();
+            }
+
+            function planWalkWithMatch() {
+                closeMutualMatchModal();
+                showToast("Let's Plan a Walk!", "Pick your route and meeting point below.");
+                switchTab('create');
+            }
+
+            function openChatWithMatchedBuddy() {
+                const buddy = buddyProfiles[currentMatchIndex];
+                closeMutualMatchModal();
+                switchToBuddyChat(buddy.name);
+                switchTab('chat');
+            }
+
+            function switchToBuddyChat(buddyName) {
+                const buddy = matchedBuddies.find(b => b.name === buddyName);
+                if (!buddy) return;
+                activeChatBuddy = buddy;
+
+                document.getElementById('chat-header-avatar').innerText = buddy.avatar;
+                document.getElementById('chat-header-name').innerText = buddy.name;
+                document.getElementById('chat-header-status').innerText = 'Active now';
+                document.getElementById('chat-remove-btn').classList.remove('hidden');
+                document.getElementById('chat-encrypted-badge').classList.add('hidden');
+
+                renderConversationList();
+                renderActiveChatMessages();
+            }
+
+            function removeCurrentMatchedBuddy() {
+                if (!activeChatBuddy) return;
+                removeMatchedBuddy(activeChatBuddy.name);
+            }
+
+            function removeMatchedBuddy(name) {
+                matchedBuddies = matchedBuddies.filter(b => b.name !== name);
+                delete chatHistories[name];
+
+                if (activeChatBuddy && activeChatBuddy.name === name) {
+                    activeChatBuddy = null;
+                    if (matchedBuddies.length > 0) {
+                        switchToBuddyChat(matchedBuddies[0].name);
+                    } else {
+                        document.getElementById('chat-header-avatar').innerText = '🌸';
+                        document.getElementById('chat-header-name').innerText = 'Main Quad Evening Walkers';
+                        document.getElementById('chat-header-status').innerText = '4 members active';
+                        document.getElementById('chat-remove-btn').classList.add('hidden');
+                        document.getElementById('chat-encrypted-badge').classList.remove('hidden');
+                        document.getElementById('chat-messages-container').innerHTML = '';
+                        renderConversationList();
+                    }
+                } else {
+                    renderConversationList();
+                }
+
+                showToast("Chat Removed", `${name.split(' ')[0]} removed. You can match with someone new now.`);
+            }
+
+            function renderConversationList() {
+                const listEl = document.getElementById('conversation-list');
+                if (!listEl) return;
+
+                if (matchedBuddies.length === 0) {
+                    listEl.classList.add('hidden');
+                    return;
+                }
+                listEl.classList.remove('hidden');
+
+                listEl.innerHTML = matchedBuddies.map(b => `
+                <button onclick="switchToBuddyChat('${b.name.replace(/'/g, "\\'")}')" class="flex flex-col items-center gap-1 flex-shrink-0 ${activeChatBuddy && activeChatBuddy.name === b.name ? 'opacity-100' : 'opacity-60'}">
+                    <div class="w-10 h-10 rounded-full animal-avatar-box flex items-center justify-center text-lg ${activeChatBuddy && activeChatBuddy.name === b.name ? 'ring-2 ring-neonPink' : ''}">${b.avatar}</div>
+                    <span class="text-[9px] font-bold text-slate-300">${b.name.split(' ')[0]}</span>
+                </button>
+            `).join('');
+            }
+
+            function renderActiveChatMessages() {
+                if (!activeChatBuddy) return;
+                const history = chatHistories[activeChatBuddy.name] || [];
+                const container = document.getElementById('chat-messages-container');
+
+                container.innerHTML = `
+                <div class="text-center text-[10px] text-slate-400 py-2">
+                    ✨ You matched with ${activeChatBuddy.name.split(' ')[0]}!
+                </div>
+            ` + history.map(m => m.fromUser ? `
+                <div class="flex items-start gap-2 justify-end">
+                    <div class="gradient-brand p-2.5 rounded-2xl rounded-tr-none text-white space-y-0.5 max-w-[80%] shadow-neon-pink">
+                        <span class="text-[9px] font-bold text-pink-200 block">You (${appState.user.name.split(' ')[0]} ${appState.user.avatar})</span>
+                        <p class="text-white">${escapeHtml(m.text)}</p>
+                        <span class="text-[8px] text-white/70 block text-right">${m.time}</span>
+                    </div>
+                    <div class="w-6 h-6 rounded-full animal-avatar-box flex items-center justify-center text-xs flex-shrink-0 shadow">${appState.user.avatar}</div>
+                </div>
+            ` : `
+                <div class="flex items-start gap-2">
+                    <div class="w-6 h-6 rounded-full bg-purple-900 border border-neonPink flex items-center justify-center text-xs flex-shrink-0">${activeChatBuddy.avatar}</div>
+                    <div class="bg-black/50 p-2.5 rounded-2xl rounded-tl-none border border-white/10 space-y-0.5 max-w-[80%]">
+                        <span class="text-[9px] font-bold text-neonPink block">${activeChatBuddy.name.split(' ')[0]}</span>
+                        <p class="text-slate-200">${escapeHtml(m.text)}</p>
+                        <span class="text-[8px] text-slate-500 block text-right">${m.time}</span>
+                    </div>
+                </div>
+            `).join('');
+
+                container.scrollTop = container.scrollHeight;
+            }
+
     </script>
 </body>
 </html>
