@@ -121,6 +121,36 @@
             pointer-events: auto;
             position: relative;
         }
+        #phone-frame {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        #phone-frame.bright-mode #device-header,
+        #phone-frame.bright-mode #app-content,
+        #phone-frame.bright-mode .phone-home-screen,
+        #phone-frame.bright-mode #device-nav,
+        #phone-frame.bright-mode #herbuddy-app-container {
+            background-color: #f8f5ff !important;
+            color: #2a0f4a;
+        }
+        #phone-frame.bright-mode .gradient-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(241,231,255,0.92) 100%) !important;
+            border-color: rgba(123,44,191,0.25) !important;
+        }
+        #phone-frame.bright-mode [class*="text-slate-"] {
+            color: #5b2a86 !important;
+        }
+        #phone-frame.bright-mode [class*="bg-black/"] {
+            background-color: rgba(124,58,199,0.08) !important;
+        }
+        #phone-frame.bright-mode [class*="border-white/"] {
+            border-color: rgba(123,44,191,0.2) !important;
+        }
+        #phone-frame.bright-mode [class*="text-white"]:not(.gradient-brand):not(.gradient-brand *) {
+            color: #2a0f4a !important;
+        }
+        #phone-frame.bright-mode .phone-home-screen {
+            background: linear-gradient(135deg, #fdf2ff 0%, #f3e8ff 50%, #ede4ff 100%) !important;
+        }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden overflow-y-auto">
@@ -146,8 +176,11 @@
             <div class="flex items-center gap-2">
                 <i data-lucide="wifi" class="w-3.5 h-3.5 text-slate-400"></i>
                 <i data-lucide="battery" class="w-4 h-4 text-slate-400"></i>
-                <button onclick="openEditProfileModal()" title="Profile Preferences" class="p-1 rounded-full text-slate-300 hover:text-neonPink hover:bg-white/10 transition">
+                 <button onclick="openEditProfileModal()" title="Profile Preferences" class="p-1 rounded-full text-slate-300 hover:text-neonPink hover:bg-white/10 transition">
                     <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="toggleBrightMode()" id="bright-mode-btn" title="Bright Mode" class="p-1 rounded-full text-slate-300 hover:text-amber-300 hover:bg-white/10 transition">
+                    <i data-lucide="sun" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
         </div>
@@ -454,7 +487,7 @@
 <a href="tel:4044133333" class="mt-1 w-full bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs py-2.5 rounded-xl shadow-lg hover:opacity-95 transition flex items-center justify-center gap-2">
         <i data-lucide="phone-call" class="w-4 h-4"></i> CALL GSU POLICE (404-413-3333)
     </a>
-    <button onclick="openFakeCallModal()" class="mt-1 w-full bg-white/10 border border-white/20 text-white font-bold text-xs py-2.5 rounded-xl hover:bg-white/20 transition flex items-center justify-center gap-2">
+    <button onclick="openFakeCallModal()" class="mt-1 w-full gradient-brand text-white font-bold text-xs py-2.5 rounded-xl shadow-neon-pink hover:opacity-95 transition flex items-center justify-center gap-2">
         <i data-lucide="phone-incoming" class="w-4 h-4"></i> Fake Call (Exit a situation)
     </button>
 </div>
@@ -1335,6 +1368,17 @@
                 }
             }, 300);
         }
+        function toggleBrightMode() {
+            const frame = document.getElementById('phone-frame');
+            frame.classList.toggle('bright-mode');
+            const btn = document.getElementById('bright-mode-btn');
+            const isOn = frame.classList.contains('bright-mode');
+            btn.classList.toggle('text-amber-300', isOn);
+            if (googleMap) {
+                googleMap.setOptions({ styles: isOn ? lightMapStyles : darkMapStyles });
+            }
+            showToast(isOn ? "☀️ Bright Mode ON" : "Bright Mode OFF", isOn ? "Màn hình đã sáng hơn để dễ nhìn trong phòng tối." : "Đã trở lại độ sáng mặc định.");
+        }
 
         function returnToHomeScreen() {
             const homeScreen = document.getElementById('phone-home-screen');
@@ -2114,6 +2158,19 @@
             // === GOOGLE MAPS INTEGRATION ===
             const GSU_CENTER = {lat: 33.7529, lng: -84.3856};
 
+            const darkMapStyles = [
+                {elementType: "geometry", stylers: [{color: "#1a0533"}]},
+                {elementType: "labels.text.stroke", stylers: [{color: "#1a0533"}]},
+                {elementType: "labels.text.fill", stylers: [{color: "#e0d7ff"}]}
+            ];
+            const lightMapStyles = [
+                {elementType: "geometry", stylers: [{color: "#f5f0ff"}]},
+                {elementType: "labels.text.stroke", stylers: [{color: "#ffffff"}]},
+                {elementType: "labels.text.fill", stylers: [{color: "#5b2a86"}]},
+                {featureType: "road", elementType: "geometry", stylers: [{color: "#e8ddff"}]},
+                {featureType: "water", elementType: "geometry", stylers: [{color: "#d6c8ff"}]}
+            ];
+
             const gsuLocations = [
                 {
                     id: 1,
@@ -2218,11 +2275,7 @@
                     center: GSU_CENTER,
                     zoom: 16,
                     disableDefaultUI: true,
-                    styles: [
-                        {elementType: "geometry", stylers: [{color: "#1a0533"}]},
-                        {elementType: "labels.text.stroke", stylers: [{color: "#1a0533"}]},
-                        {elementType: "labels.text.fill", stylers: [{color: "#e0d7ff"}]}
-                    ]
+                     styles: darkMapStyles
                 });
 
                 gsuLocations.forEach(loc => {
