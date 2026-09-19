@@ -5,7 +5,8 @@ export const THEMES = [
     { id: 'teal', name: 'Midnight Teal', colors: ['#013A63', '#22D3EE'] },
     { id: 'coral', name: 'Sunset Coral', colors: ['#C2410C', '#F97316'] },
     { id: 'emerald', name: 'Forest Emerald', colors: ['#065F46', '#34D399'] },
-    { id: 'ocean', name: 'Ocean Blue', colors: ['#1D4ED8', '#38BDF8'] }
+    { id: 'ocean', name: 'Ocean Blue', colors: ['#1D4ED8', '#38BDF8'] },
+    { id: 'bright', name: 'Bright Mode', colors: ['#F5F0FF', '#7B2CBF'] }
 ];
 
 export function getCurrentTheme() {
@@ -20,6 +21,7 @@ export function applyTheme(themeId) {
     } catch (err) {
         // localStorage unavailable — theme just won't persist across reloads.
     }
+    window.dispatchEvent(new CustomEvent('herbuddy:theme-changed', { detail: { theme: valid } }));
     return valid;
 }
 

@@ -61,12 +61,48 @@
     --bg-app: 1 2 8;
 }
 
+[data-theme="bright"] {
+    --color-deepIndigo: 245 240 255;
+    --color-darkPurple: 237 228 255;
+    --color-electricPurple: 123 44 191;
+    --color-deepViolet: 91 42 134;
+    --color-radiantPink: 219 39 119;
+    --color-neonPink: 255 46 147;
+    --color-softPinkBg: 255 229 241;
+    --bg-app: 248 245 255;
+    --text-app: rgb(42 15 74);
+}
+
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: rgb(var(--bg-app));
-    color: #f8fafc;
+    color: var(--text-app, #f8fafc);
     -webkit-tap-highlight-color: transparent;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ported from the team's monolithic-HTML "Bright Mode" toggle: our brand
+   palette above is designed dark-first, so a light theme also needs these
+   overrides for the plain (non-variable) Tailwind utility classes used
+   throughout the markup — text-white, bg-black/NN, border-white/NN, etc. */
+[data-theme="bright"] .gradient-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(241,231,255,0.92) 100%);
+    border-color: rgba(123,44,191,0.25);
+}
+[data-theme="bright"] [class*="text-slate-"] {
+    color: #5b2a86;
+}
+[data-theme="bright"] [class*="bg-black/"] {
+    background-color: rgba(124,58,199,0.08);
+}
+[data-theme="bright"] [class*="border-white/"] {
+    border-color: rgba(123,44,191,0.2);
+}
+[data-theme="bright"] [class*="text-white"]:not(.gradient-brand):not(.gradient-brand *) {
+    color: #2a0f4a;
+}
+[data-theme="bright"] .phone-home-screen {
+    background: linear-gradient(135deg, #fdf2ff 0%, #f3e8ff 50%, #ede4ff 100%);
 }
 
 /* Our hb-* elements are purely structural (each renders one block-level
