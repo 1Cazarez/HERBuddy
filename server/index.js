@@ -19,6 +19,8 @@ const { default: errandsRouter } = await import('./routes/errands.js');
 const { default: chatRouter } = await import('./routes/chat.js');
 const { default: configRouter } = await import('./routes/config.js');
 const { default: matchesRouter } = await import('./routes/matches.js');
+const { default: friendsRouter } = await import('./routes/friends.js');
+const { default: walkSessionsRouter } = await import('./routes/walk-sessions.js');
 
 const app = express();
 
@@ -35,6 +37,8 @@ app.use('/api/walks', checkJwt, walksRouter);
 app.use('/api/errands', checkJwt, errandsRouter);
 app.use('/api/chat', checkJwt, chatRouter);
 app.use('/api/matches', checkJwt, matchesRouter);
+app.use('/api/friends', checkJwt, friendsRouter);
+app.use('/api/walk-sessions', checkJwt, walkSessionsRouter);
 
 // Keep this last: express-oauth2-jwt-bearer throws an UnauthorizedError that
 // needs to be turned into a clean 401 instead of a stack trace; our own

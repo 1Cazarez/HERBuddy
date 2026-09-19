@@ -16,7 +16,27 @@ customElements.define('hb-tab-match', class extends HTMLElement {
                 </button>
             </div>
 
-            <div id="match-card-area" class="relative"></div>
+            <div class="flex gap-2 bg-black/40 border border-white/10 rounded-2xl p-1">
+                <button onclick="switchMatchView('discover')" id="match-view-btn-discover" class="match-view-btn flex-1 py-2 rounded-xl text-xs font-bold gradient-brand text-white transition">
+                    Find a Buddy
+                </button>
+                <button onclick="switchMatchView('friends')" id="match-view-btn-friends" class="match-view-btn flex-1 py-2 rounded-xl text-xs font-bold text-slate-400 transition">
+                    Friends
+                </button>
+            </div>
+
+            <div id="match-view-discover">
+                <div id="match-card-area" class="relative"></div>
+            </div>
+
+            <div id="match-view-friends" class="hidden space-y-3">
+                <p class="text-xs text-slate-400">Add walking buddies you already know so you can check in on each other during walks.</p>
+                <form onsubmit="addFriendByEmail(event)" class="flex gap-2">
+                    <input type="email" id="add-friend-email" required placeholder="Friend's Herbuddy email" class="flex-1 bg-black/50 border border-white/20 px-3 py-2.5 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-neonPink">
+                    <button type="submit" class="gradient-brand text-white px-4 rounded-xl text-xs font-black shadow-neon-pink hover:opacity-95 transition">Add</button>
+                </form>
+                <div id="friends-list-container" class="space-y-2"></div>
+            </div>
         </section>
         `;
     }

@@ -9,6 +9,7 @@ import { subscribeToChat } from './chat.js';
 import { subscribeToWalks } from './walks.js';
 import { subscribeToErrands } from './errands.js';
 import { initMatches } from './match.js';
+import { subscribeToFriends } from './friends.js';
 
 // Local demo-mode login — used only when Auth0/TigerData aren't configured.
 export function handleLoginSubmit(e) {
@@ -42,6 +43,7 @@ function completeLogin() {
         subscribeToWalks();
         subscribeToErrands();
         initMatches();
+        subscribeToFriends();
     }
 }
 

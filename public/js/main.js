@@ -66,6 +66,7 @@ import {
 import { openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall } from './fakecall.js';
 import { openReportModal, closeReportModal, submitSafetyReport, renderSafetyReports } from './reports.js';
 import { openCompanionModal, closeCompanionModal, startCompanionCall } from './companion.js';
+import { switchMatchView, addFriendByEmail, removeFriend, checkInOnFriend, openFriendChat } from './friends.js';
 
 Object.assign(window, {
     switchTab,
@@ -85,7 +86,8 @@ Object.assign(window, {
     openChatWithMatchedBuddy, switchToBuddyChat, switchToGroupChat, removeCurrentMatchedBuddy,
     openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall,
     openReportModal, closeReportModal, submitSafetyReport,
-    openCompanionModal, closeCompanionModal, startCompanionCall
+    openCompanionModal, closeCompanionModal, startCompanionCall,
+    switchMatchView, addFriendByEmail, removeFriend, checkInOnFriend, openFriendChat
 });
 
 document.addEventListener('DOMContentLoaded', () => {

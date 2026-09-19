@@ -5,13 +5,22 @@ const router = Router();
 const GROUP_ROOM = 'main-quad';
 
 // Buddy-match 1:1 rooms are named "buddy:<uid>:<buddyName>" so each user's
-// thread with a given (demo) buddy is private to them. Anything else falls
-// through to the shared group room.
+// thread with a given (demo) buddy is private to them. Real-friend 1:1
+// rooms are "friend:<uidA>:<uidB>" with the two uids sorted so both sides
+// compute the same room name — access requires being one of the two.
+// Anything else falls through to the shared group room.
 function assertRoomAccess(room, uid) {
-    if (room.startsWith('buddy:') && !room.startsWith(`buddy:${uid}:`)) {
+    const forbidden = () => {
         const err = new Error('Forbidden');
         err.status = 403;
         throw err;
+    };
+    if (room.startsWith('buddy:') && !room.startsWith(`buddy:${uid}:`)) {
+        forbidden();
+    }
+    if (room.startsWith('friend:')) {
+        const parts = room.split(':');
+        if (parts.length !== 3 || !parts.slice(1).includes(uid)) forbidden();
     }
 }
 

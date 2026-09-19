@@ -12,6 +12,10 @@ export function buddyRoom(buddyName) {
     return `buddy:${appState.userId}:${buddyName}`;
 }
 
+export function friendRoom(otherUserId) {
+    return `friend:${[appState.userId, otherUserId].sort().join(':')}`;
+}
+
 // Switches which room the poller/renderer targets — used when the user
 // taps a matched buddy's avatar to open their 1:1 thread, or 'main-quad'
 // to go back to the shared group chat.

@@ -38,7 +38,7 @@ server/
   auth.js                     # Auth0 access-token verification middleware
   schema.sql                   # tables + demo seed data
   seed.js                        # `npm run seed` runner for schema.sql
-  routes/{me,walks,errands,chat}.js
+  routes/{me,walks,walk-sessions,errands,chat,matches,friends,config}.js
 ```
 
 Each page/tab on the frontend is a custom element (e.g. `<hb-tab-chat>`,
