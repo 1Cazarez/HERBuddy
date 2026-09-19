@@ -16,7 +16,14 @@ export const appState = {
         steps: 6420,
         activeMinutes: 38,
         weeklyDistance: 14.8,
-        completedErrands: 9
+        completedErrands: 9,
+        year: "",
+        major: "",
+        interests: [],
+        clubs: [],
+        events: [],
+        zone: "Library Area",
+        walkingStyle: "Social"
     },
     activeWalk: null,
     timerInterval: null,

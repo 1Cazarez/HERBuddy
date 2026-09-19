@@ -20,11 +20,11 @@ customElements.define('hb-tab-create', class extends HTMLElement {
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Origin</label>
-                        <input type="text" id="input-origin" required value="Student Center" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white">
+                        <select id="input-origin" required onchange="updateRouteEstimate()" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Destination</label>
-                        <input type="text" id="input-destination" required value="Library" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white">
+                        <select id="input-destination" required onchange="updateRouteEstimate()" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white"></select>
                     </div>
                 </div>
 
@@ -43,11 +43,7 @@ customElements.define('hb-tab-create', class extends HTMLElement {
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Est. Distance</label>
-                        <select id="input-distance" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white">
-                            <option value="0.8">0.8 miles (15 min)</option>
-                            <option value="1.2" selected>1.2 miles (23 min)</option>
-                            <option value="2.0">2.0 miles (35 min)</option>
-                        </select>
+                        <input type="text" id="input-distance" readonly class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white" value="-- miles">
                     </div>
                 </div>
 

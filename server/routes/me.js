@@ -30,7 +30,8 @@ router.put('/', async (req, res, next) => {
         const uid = req.auth.payload.sub;
         const {
             name, email, campus, contact,
-            step_goal, avatar, steps, active_minutes, weekly_distance, completed_errands
+            step_goal, avatar, steps, active_minutes, weekly_distance, completed_errands,
+            year, major, interests, clubs, events, zone, walking_style
         } = req.body;
 
         const { rows } = await pool.query(
@@ -44,10 +45,18 @@ router.put('/', async (req, res, next) => {
                 steps = COALESCE($8, steps),
                 active_minutes = COALESCE($9, active_minutes),
                 weekly_distance = COALESCE($10, weekly_distance),
-                completed_errands = COALESCE($11, completed_errands)
+                completed_errands = COALESCE($11, completed_errands),
+                year = COALESCE($12, year),
+                major = COALESCE($13, major),
+                interests = COALESCE($14, interests),
+                clubs = COALESCE($15, clubs),
+                events = COALESCE($16, events),
+                zone = COALESCE($17, zone),
+                walking_style = COALESCE($18, walking_style)
              WHERE id = $1
              RETURNING *`,
-            [uid, name, email, campus, contact, step_goal, avatar, steps, active_minutes, weekly_distance, completed_errands]
+            [uid, name, email, campus, contact, step_goal, avatar, steps, active_minutes, weekly_distance, completed_errands,
+                year, major, interests, clubs, events, zone, walking_style]
         );
 
         if (!rows.length) return res.status(404).json({ error: 'User not found' });

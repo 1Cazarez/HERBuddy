@@ -23,28 +23,8 @@ customElements.define('hb-tab-find', class extends HTMLElement {
                     <span class="text-emerald-400 font-mono text-[10px]">3 Active Groups</span>
                 </div>
 
-                <div id="find-map-canvas" class="relative flex-1 my-2 rounded-2xl bg-black/60 border border-white/10 overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <svg class="w-full h-full" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 30 170 Q 150 150 250 40" stroke="#7B2CBF" stroke-width="4" stroke-dasharray="6 6" class="animate-pulse"/>
-                            <path d="M 30 170 Q 150 150 250 40" stroke="#FF2E93" stroke-width="2"/>
-                        </svg>
-                    </div>
-
-                    <div class="absolute bottom-6 left-8 flex flex-col items-center">
-                        <div class="w-6 h-6 rounded-full bg-purple-900 border-2 border-neonPink flex items-center justify-center text-[10px] shadow-lg">🏫</div>
-                        <span class="text-[8px] font-bold bg-black/70 px-1 py-0.5 rounded text-white mt-0.5">Student Center</span>
-                    </div>
-
-                    <div class="absolute top-6 right-8 flex flex-col items-center">
-                        <div class="w-6 h-6 rounded-full bg-emerald-900 border-2 border-emerald-400 flex items-center justify-center text-[10px] shadow-lg">📚</div>
-                        <span class="text-[8px] font-bold bg-black/70 px-1 py-0.5 rounded text-white mt-0.5">Library</span>
-                    </div>
-
-                    <div id="find-map-user-pin" class="absolute top-[48%] left-[45%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center transition-all duration-700">
-                        <div class="w-8 h-8 rounded-full gradient-brand border-2 border-white flex items-center justify-center text-sm shadow-neon-pink pulse-pink" id="find-map-avatar-marker">🦊</div>
-                        <span class="text-[9px] font-black bg-neonPink text-white px-2 py-0.5 rounded-full shadow mt-0.5">You & Buddies</span>
-                    </div>
+                <div id="find-map-canvas" class="relative flex-1 my-2 rounded-2xl overflow-hidden border border-white/10">
+                    <div id="google-map" style="width:100%; height:100%;"></div>
                 </div>
 
                 <div class="flex gap-2 z-10">
