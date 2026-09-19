@@ -2,6 +2,7 @@ import { backendEnabled } from './api-config.js';
 import { apiPut } from './api.js';
 import { appState } from './state.js';
 import { showToast } from './utils.js';
+import { highlightActiveSwatch } from './theme.js';
 
 export function syncStateToUI() {
     const u = appState.user;
@@ -55,6 +56,7 @@ export function openEditProfileModal() {
     document.getElementById('edit-contact').value = appState.user.contact;
     document.getElementById('edit-stepgoal').value = appState.user.stepGoal;
     document.getElementById('modal-avatar-preview').innerText = appState.user.avatar;
+    highlightActiveSwatch();
 }
 
 export function closeEditProfileModal() {

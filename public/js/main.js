@@ -39,6 +39,7 @@ import {
     submitNewErrand
 } from './errands.js';
 import { triggerEmergencyCheckInTest } from './sos.js';
+import { initTheme, selectTheme } from './theme.js';
 
 Object.assign(window, {
     switchTab,
@@ -49,13 +50,15 @@ Object.assign(window, {
     quickJoinSuggestedRoute, triggerArrivalCheckIn, simulateFindMapMove,
     renderErrandList, acceptErrandRequest, openNewErrandModal, closeNewErrandModal, submitNewErrand,
     triggerEmergencyCheckInTest,
-    showToast, hideToast
+    showToast, hideToast,
+    selectTheme
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) {
         lucide.createIcons();
     }
+    initTheme();
     renderWalkList();
     renderErrandList();
     updateClock();
