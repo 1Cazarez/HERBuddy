@@ -17,6 +17,8 @@ import './components/edit-profile-modal.js';
 import './components/errand-modal.js';
 import './components/tab-match.js';
 import './components/mutual-match-modal.js';
+import './components/fake-call-modal.js';
+import './components/report-modal.js';
 
 import { showToast, hideToast, updateClock } from './utils.js';
 import { switchTab } from './navigation.js';
@@ -48,8 +50,14 @@ import {
     resetMatches,
     connectWithBuddy,
     closeMutualMatchModal,
-    planWalkWithMatch
+    planWalkWithMatch,
+    openChatWithMatchedBuddy,
+    switchToBuddyChat,
+    switchToGroupChat,
+    removeCurrentMatchedBuddy
 } from './match.js';
+import { openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall } from './fakecall.js';
+import { openReportModal, closeReportModal, submitSafetyReport, renderSafetyReports } from './reports.js';
 
 Object.assign(window, {
     switchTab,
@@ -63,7 +71,10 @@ Object.assign(window, {
     showToast, hideToast,
     selectTheme,
     updateRouteEstimate, simulateFindMapMove,
-    skipBuddy, resetMatches, connectWithBuddy, closeMutualMatchModal, planWalkWithMatch
+    skipBuddy, resetMatches, connectWithBuddy, closeMutualMatchModal, planWalkWithMatch,
+    openChatWithMatchedBuddy, switchToBuddyChat, switchToGroupChat, removeCurrentMatchedBuddy,
+    openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall,
+    openReportModal, closeReportModal, submitSafetyReport
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderWalkList();
     renderErrandList();
     renderMatchCard();
+    renderSafetyReports();
     updateClock();
     setInterval(updateClock, 30000);
     initAuthListener();

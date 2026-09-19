@@ -51,6 +51,12 @@ customElements.define('hb-tab-find', class extends HTMLElement {
             <div id="walks-container" class="space-y-3">
                 <!-- Dynamic walk cards inserted via JS -->
             </div>
+
+            <button onclick="openReportModal()" class="w-full bg-amber-950/60 border border-amber-500/40 text-amber-300 font-bold text-xs py-2.5 rounded-2xl hover:bg-amber-900/60 transition flex items-center justify-center gap-2">
+                <i data-lucide="flag" class="w-4 h-4"></i> Report an Unsafe Area
+            </button>
+
+            <div id="safety-reports-container" class="space-y-2"></div>
         </section>
         `;
     }

@@ -5,6 +5,7 @@ import { showToast } from './utils.js';
 import { switchTab } from './navigation.js';
 import { syncStateToUI } from './profile.js';
 import { gsuLocations, calcDistanceMiles, startRealWalkTracking, stopWalkTracking } from './map.js';
+import { playSnsAudioAlert } from './sos.js';
 
 const POLL_INTERVAL_MS = 4000;
 let pollHandle = null;
@@ -46,6 +47,14 @@ async function refreshWalks() {
 export function renderWalkList() {
     const container = document.getElementById('walks-container');
     if (!container) return;
+
+    // A person can only be walking to one point at a time, so once they've
+    // joined a walk, show just that walk instead of the full browsable list.
+    const joinedWalk = appState.walks.find(w => w.joined);
+    if (joinedWalk) {
+        renderJoinedWalkOnly(container, joinedWalk);
+        return;
+    }
 
     const searchInput = document.getElementById('find-search-input');
     const query = searchInput ? searchInput.value.toLowerCase() : '';
@@ -96,6 +105,48 @@ export function renderWalkList() {
     }
 }
 
+function renderJoinedWalkOnly(container, w) {
+    const countBadge = document.getElementById('routes-count-badge');
+    if (countBadge) countBadge.innerText = `1 Active`;
+
+    container.innerHTML = `
+        <div class="gradient-card p-4 rounded-3xl space-y-3 border border-emerald-500/40">
+            <div class="flex justify-between items-start">
+                <div>
+                    <span class="text-[10px] font-extrabold text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 rounded-md">
+                        ✓ You're Walking
+                    </span>
+                    <h3 class="text-sm font-black text-white mt-1.5">${w.title}</h3>
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-400">${w.time}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-300">
+                <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-neonPink"></i> ${w.from} → ${w.to}</span>
+                <span class="font-bold text-white">${w.distance}</span>
+            </div>
+
+            <div class="pt-2 border-t border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="flex -space-x-2">
+                        ${w.avatars.map(a => `<div class="w-6 h-6 rounded-full bg-purple-950 border border-neonPink flex items-center justify-center text-xs">${a}</div>`).join('')}
+                    </div>
+                    <span class="text-[11px] font-bold text-slate-300">${w.buddies} buddies walking</span>
+                </div>
+                <button onclick="joinWalkFromList(${w.id})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+                    Leave Group
+                </button>
+            </div>
+
+            <p class="text-[11px] text-slate-400 text-center pt-1">You can only join one walk at a time. Leave this group to browse other routes.</p>
+        </div>
+    `;
+
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
 export function setFilter(filterType, e) {
     appState.activeFilter = filterType;
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -110,6 +161,12 @@ export function setFilter(filterType, e) {
 export async function joinWalkFromList(id) {
     const walk = appState.walks.find(w => w.id === id);
     if (!walk) return;
+
+    const currentWalk = appState.walks.find(w => w.joined);
+    if (currentWalk && currentWalk.id !== id) {
+        showToast("Already Walking", `Leave "${currentWalk.title}" before joining another walk.`);
+        return;
+    }
 
     walk.joined = !walk.joined;
     if (walk.joined) {
@@ -158,6 +215,7 @@ export async function handleCreateWalk(e) {
 
     const title = document.getElementById('input-route-title').value || `${originLoc.name} → ${destLoc.name}`;
     const distanceMiles = calcDistanceMiles(originLoc, destLoc);
+    const alertMinutes = parseInt(document.getElementById('input-alert-timeout').value, 10) || 30;
 
     appState.activeWalk = {
         title,
@@ -165,7 +223,9 @@ export async function handleCreateWalk(e) {
         to: destLoc.name,
         destinationName: destLoc.name,
         distance: `${distanceMiles} miles`,
-        buddies: 3
+        buddies: 3,
+        alertMinutes,
+        alertTriggered: false
     };
 
     startRealWalkTracking(originLoc, destLoc);
@@ -201,7 +261,9 @@ export function quickJoinSuggestedRoute() {
         to: "GSU Library",
         destinationName: "GSU Library",
         distance: originLoc && destLoc ? `${calcDistanceMiles(originLoc, destLoc)} miles` : "1.2 miles",
-        buddies: 3
+        buddies: 3,
+        alertMinutes: 30,
+        alertTriggered: false
     };
     if (originLoc && destLoc) startRealWalkTracking(originLoc, destLoc);
     showActiveWalkBanner();
@@ -220,8 +282,21 @@ export function showActiveWalkBanner() {
             const mins = Math.floor(appState.secondsElapsed / 60);
             const secs = appState.secondsElapsed % 60;
             document.getElementById('walk-timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            const limitMinutes = (appState.activeWalk && appState.activeWalk.alertMinutes) || 30;
+            if (appState.activeWalk && !appState.activeWalk.alertTriggered && appState.secondsElapsed >= limitMinutes * 60) {
+                appState.activeWalk.alertTriggered = true;
+                triggerLateArrivalAlert();
+            }
         }, 1000);
     }
+}
+
+function triggerLateArrivalAlert() {
+    playSnsAudioAlert();
+    const banner = document.getElementById('active-walk-banner');
+    banner.querySelector('div').classList.add('!from-rose-700', '!via-red-700', '!to-rose-800');
+    showToast("⚠️ Overdue Check-in!", `You haven't arrived yet. ${appState.user.contact} has been alerted automatically.`);
 }
 
 export async function triggerArrivalCheckIn() {

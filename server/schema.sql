@@ -73,6 +73,18 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 
 CREATE INDEX IF NOT EXISTS chat_messages_room_created_at_idx ON chat_messages (room, created_at);
 
+-- Buddy Match's matched buddies. The buddy "profiles" themselves are still
+-- a hardcoded demo list on the frontend (not real other users), so this
+-- just tracks which of those demo names each real user has matched with —
+-- enough to persist the match + let their 1:1 chat thread survive reloads.
+CREATE TABLE IF NOT EXISTS matched_buddies (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    buddy_name TEXT NOT NULL,
+    matched_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (user_id, buddy_name)
+);
+
 -- Seed demo data so the app has something to show right after setup.
 -- Skipped automatically once real rows exist.
 INSERT INTO walks (title, from_location, to_location, time, distance, buddies, night_safe, avatars)

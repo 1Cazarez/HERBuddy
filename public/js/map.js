@@ -22,6 +22,11 @@ let userMarker = null;
 let walkRouteCoords = [];
 let walkAnimationInterval = null;
 let activeWalkPolyline = null;
+let directionsService = null;
+
+export function getGoogleMap() {
+    return googleMap;
+}
 
 export function calcDistanceMiles(a, b) {
     const R = 3958.8;
@@ -48,6 +53,12 @@ export function populateLocationSelects() {
     updateRouteEstimate();
 }
 
+function applyFallbackEstimate(originLoc, destLoc) {
+    const miles = calcDistanceMiles(originLoc, destLoc);
+    const estMinutes = Math.max(3, Math.round(miles * 20));
+    document.getElementById('input-distance').value = `~${miles} miles (${estMinutes} min)`;
+}
+
 export function updateRouteEstimate() {
     const originId = parseInt(document.getElementById('input-origin').value, 10);
     const destId = parseInt(document.getElementById('input-destination').value, 10);
@@ -55,9 +66,28 @@ export function updateRouteEstimate() {
     const destLoc = gsuLocations.find(l => l.id === destId);
     if (!originLoc || !destLoc) return;
 
-    const miles = calcDistanceMiles(originLoc, destLoc);
-    const estMinutes = Math.max(3, Math.round(miles * 20));
-    document.getElementById('input-distance').value = `${miles} miles (${estMinutes} min)`;
+    document.getElementById('input-distance').value = 'Calculating...';
+
+    if (!directionsService && window.google && google.maps) {
+        directionsService = new google.maps.DirectionsService();
+    }
+
+    if (directionsService) {
+        directionsService.route({
+            origin: { lat: originLoc.lat, lng: originLoc.lng },
+            destination: { lat: destLoc.lat, lng: destLoc.lng },
+            travelMode: google.maps.TravelMode.WALKING
+        }, (result, status) => {
+            if (status === 'OK') {
+                const leg = result.routes[0].legs[0];
+                document.getElementById('input-distance').value = `${leg.distance.text} (${leg.duration.text})`;
+            } else {
+                applyFallbackEstimate(originLoc, destLoc);
+            }
+        });
+    } else {
+        applyFallbackEstimate(originLoc, destLoc);
+    }
 
     const timeInput = document.getElementById('input-time');
     if (timeInput && !timeInput.dataset.userEdited) {

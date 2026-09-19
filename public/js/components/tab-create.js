@@ -52,6 +52,17 @@ customElements.define('hb-tab-create', class extends HTMLElement {
                         <i data-lucide="shield" class="w-3.5 h-3.5"></i> Safety Controls
                     </span>
 
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">Alert Emergency Contact If Not Arrived Within</label>
+                        <select id="input-alert-timeout" class="w-full bg-black/40 border border-white/10 px-3 py-2 rounded-xl text-xs text-white">
+                            <option value="30" selected>30 minutes (Recommended)</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                            <option value="180">3 hours</option>
+                        </select>
+                    </div>
+
                     <div class="flex justify-between items-center">
                         <span class="text-xs text-slate-300">Auto Check-in Timer & Ping</span>
                         <input type="checkbox" id="check-safety-ping" checked class="accent-neonPink rounded">
