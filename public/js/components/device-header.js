@@ -1,7 +1,7 @@
 customElements.define('hb-device-header', class extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-        <div id="device-header" class="hidden px-6 pt-3 pb-2 justify-between items-center text-xs font-semibold text-slate-300 z-40 bg-deepIndigo/90 backdrop-blur-md border-b border-white/10">
+        <div id="device-header" class="hidden px-6 pt-3 pb-3 justify-between items-center text-xs font-semibold text-slate-300 z-40 bg-deepIndigo/90 backdrop-blur-md border-b border-white/10">
             <button onclick="switchTab('home')" title="Go to Home" class="font-black tracking-tight text-neonPink flex items-center gap-1.5 hover:opacity-80 transition cursor-pointer">
                 <svg viewBox="0 0 64 64" class="w-5 h-5 drop-shadow" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M32 6C18 6 12 12 12 26C12 42 32 58 32 58C32 58 52 42 52 26C52 12 46 6 32 6Z" fill="url(#hdr-logo-grad)" stroke="#FFF" stroke-width="2"/>
