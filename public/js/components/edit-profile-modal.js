@@ -1,3 +1,11 @@
+import { THEMES } from '../theme.js';
+
+const themeSwatches = THEMES.map(t => `
+    <button type="button" onclick="selectTheme('${t.id}')" data-theme-swatch="${t.id}" title="${t.name}"
+        class="theme-swatch w-9 h-9 rounded-full border border-white/20"
+        style="background: linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})"></button>
+`).join('');
+
 customElements.define('hb-edit-profile-modal', class extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
@@ -42,6 +50,13 @@ customElements.define('hb-edit-profile-modal', class extends HTMLElement {
                             <button type="button" onclick="selectEditAvatar('👩🏽')" class="p-2 bg-black/40 border border-white/20 rounded-xl text-xl hover:scale-110 transition">👩🏽</button>
                         </div>
                         <div class="text-center mt-1 text-[10px] text-slate-400">Selected: <span id="modal-avatar-preview" class="text-base">🦊</span></div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1">App Theme</label>
+                        <div class="flex gap-2 justify-center py-1">
+                            ${themeSwatches}
+                        </div>
                     </div>
 
                     <button type="submit" class="w-full gradient-brand text-white font-black py-3 rounded-xl shadow-neon-pink hover:opacity-95 transition mt-2">

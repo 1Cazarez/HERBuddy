@@ -4,12 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Herbuddy - Campus Safety, Wellness & Pickups</title>
+
+    <script>
+        // Applied before first paint so switching themes doesn't flash the
+        // default (classic) palette on reload.
+        (function () {
+            try {
+                var saved = localStorage.getItem('herbuddy-theme');
+                if (saved) document.documentElement.setAttribute('data-theme', saved);
+            } catch (err) { /* localStorage unavailable (private mode, etc.) */ }
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 
     <script>
+        // Colors resolve through CSS variables (see css/styles.css) so a
+        // theme switch just changes those variables' values at runtime —
+        // no need to regenerate or swap any Tailwind utility classes.
+        function withOpacity(variable) {
+            return ({ opacityValue }) => opacityValue === undefined
+                ? `rgb(var(${variable}))`
+                : `rgb(var(${variable}) / ${opacityValue})`;
+        }
+
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -18,17 +39,17 @@
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
                     },
                     colors: {
-                        deepIndigo: '#10002B',
-                        darkPurple: '#240046',
-                        electricPurple: '#7B2CBF',
-                        deepViolet: '#3A0CA3',
-                        radiantPink: '#E01E5A',
-                        neonPink: '#FF2E93',
-                        softPinkBg: '#FFE5F1'
+                        deepIndigo: withOpacity('--color-deepIndigo'),
+                        darkPurple: withOpacity('--color-darkPurple'),
+                        electricPurple: withOpacity('--color-electricPurple'),
+                        deepViolet: withOpacity('--color-deepViolet'),
+                        radiantPink: withOpacity('--color-radiantPink'),
+                        neonPink: withOpacity('--color-neonPink'),
+                        softPinkBg: withOpacity('--color-softPinkBg')
                     },
                     boxShadow: {
-                        'neon-pink': '0 0 25px rgba(255, 46, 147, 0.45)',
-                        'neon-purple': '0 0 25px rgba(123, 44, 191, 0.45)',
+                        'neon-pink': '0 0 25px rgb(var(--color-neonPink) / 0.45)',
+                        'neon-purple': '0 0 25px rgb(var(--color-electricPurple) / 0.45)',
                     }
                 }
             }
