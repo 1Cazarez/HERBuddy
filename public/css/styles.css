@@ -1,0 +1,65 @@
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #080018;
+    color: #f8fafc;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Our hb-* elements are purely structural (each renders one block-level
+   section/component into the light DOM) but undefined/custom elements
+   default to `display: inline`. Left as inline, a block-level child inside
+   an inline wrapper can produce inconsistent hit-testing (clicks landing on
+   the wrapper instead of the actual control). `display: contents` removes
+   the wrapper from layout entirely so only its children participate. */
+hb-toast, hb-device-header, hb-active-walk-banner, hb-login-screen,
+hb-tab-home, hb-tab-find, hb-tab-wellness, hb-tab-chat, hb-tab-create,
+hb-tab-pickup, hb-tab-profile, hb-nav-bar, hb-edit-profile-modal, hb-errand-modal {
+    display: contents;
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.tab-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+.tab-content.active {
+    display: block;
+    opacity: 1;
+}
+
+.gradient-brand {
+    background: linear-gradient(135deg, #7B2CBF 0%, #3A0CA3 40%, #E01E5A 75%, #FF2E93 100%);
+}
+
+.gradient-card {
+    background: linear-gradient(145deg, rgba(36, 0, 70, 0.85) 0%, rgba(16, 0, 43, 0.95) 100%);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 46, 147, 0.25);
+}
+
+.animal-avatar-box {
+    background: linear-gradient(135deg, rgba(123, 44, 191, 0.3) 0%, rgba(255, 46, 147, 0.3) 100%);
+    border: 1.5px solid rgba(255, 46, 147, 0.5);
+    transition: all 0.2s ease;
+}
+
+.pulse-pink {
+    animation: pulse-pink-ring 2s infinite;
+}
+@keyframes pulse-pink-ring {
+    0% { box-shadow: 0 0 0 0 rgba(255, 46, 147, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(255, 46, 147, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 46, 147, 0); }
+}
+
+.pulse-emerald {
+    animation: pulse-emerald-ring 2s infinite;
+}
+@keyframes pulse-emerald-ring {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
