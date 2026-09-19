@@ -1288,6 +1288,8 @@
                 document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) {
                 lucide.createIcons();
+
+
             }
             initAuth0();
             renderWalkList();
@@ -1357,6 +1359,7 @@
         let auth0Client = null;
 
         async function initAuth0() {
+            try {
             auth0Client = await auth0.createAuth0Client({
                 domain: AUTH0_DOMAIN,
                 clientId: AUTH0_CLIENT_ID,
@@ -1400,16 +1403,24 @@
                     syncStateToUI();
                     switchTab('home');
                     showToast("Welcome back!", `Hey ${appState.user.name}!`);
-                } else {
+                                } else {
                     document.getElementById('auth-step-signin').classList.add('hidden');
                     document.getElementById('auth-step-profile').classList.remove('hidden');
                     document.getElementById('auth-verified-email').innerText = `Verified: ${authUser.email}`;
                     if (window.lucide) lucide.createIcons();
                 }
             }
+            } catch (err) {
+                console.error("Auth0 init failed:", err);
+                showToast("Lỗi tải đăng nhập", err.message || "Không thể khởi tạo Auth0. Kiểm tra mạng.");
+            }
         }
 
         function loginWithAuth0() {
+            if (!auth0Client) {
+                showToast("Đang tải...", "Hệ thống đăng nhập chưa sẵn sàng, vui lòng đợi 1-2 giây rồi bấm lại.");
+                return;
+            }
             auth0Client.loginWithRedirect();
         }
 
