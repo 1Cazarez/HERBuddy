@@ -1,7 +1,7 @@
 customElements.define('hb-nav-bar', class extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-        <nav id="device-nav" class="hidden absolute bottom-0 left-0 right-0 bg-deepIndigo/95 backdrop-blur-md border-t border-white/10 px-4 py-2.5 justify-around items-center z-30">
+        <nav id="device-nav" class="hidden absolute bottom-0 left-0 right-0 bg-deepIndigo/95 backdrop-blur-md border-t border-white/10 px-4 pt-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] justify-around items-center z-30">
             <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center gap-1 text-neonPink font-extrabold transition">
                 <i data-lucide="home" class="w-5 h-5"></i>
                 <span class="text-[10px]">Home</span>

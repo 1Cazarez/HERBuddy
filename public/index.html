@@ -2,7 +2,7 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Herbuddy - Campus Safety, Wellness & Pickups</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -35,16 +35,16 @@
         };
     </script>
 </head>
-<body class="min-h-screen flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden">
+<body class="min-h-[100dvh] flex justify-center items-center p-0 sm:p-4 md:p-6 select-none overflow-x-hidden">
 
-    <div class="w-full max-w-md h-screen md:h-[920px] bg-deepIndigo sm:rounded-[44px] shadow-neon-purple overflow-hidden flex flex-col relative border-0 sm:border-[8px] border-slate-900">
+    <div class="w-full max-w-md h-[100dvh] md:h-[920px] bg-deepIndigo sm:rounded-[44px] shadow-neon-purple overflow-hidden flex flex-col relative border-0 sm:border-[8px] border-slate-900">
 
         <hb-device-header></hb-device-header>
         <hb-toast></hb-toast>
         <hb-active-walk-banner></hb-active-walk-banner>
 
         <div id="herbuddy-app-container" class="flex-1 flex flex-col relative bg-deepIndigo">
-            <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar relative px-4 pb-20 pt-2 space-y-4">
+            <main id="app-content" class="flex-1 overflow-y-auto no-scrollbar relative px-4 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-2 space-y-4">
                 <hb-login-screen></hb-login-screen>
                 <hb-tab-home></hb-tab-home>
                 <hb-tab-find></hb-tab-find>
