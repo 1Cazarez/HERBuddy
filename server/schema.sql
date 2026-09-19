@@ -85,6 +85,34 @@ CREATE TABLE IF NOT EXISTS matched_buddies (
     UNIQUE (user_id, buddy_name)
 );
 
+-- Real-user friendships (separate from Buddy Match, which matches against
+-- a hardcoded demo list). Stored as one row per direction so "my friends"
+-- is a plain WHERE user_id = $1 with no OR/self-join needed.
+CREATE TABLE IF NOT EXISTS friends (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    friend_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, friend_id)
+);
+
+-- Persists each walk a user starts so friends can see live status (walking
+-- now / overdue / not walking) rather than that state living only in the
+-- walker's own browser tab. expected_arrival_at is started_at + the walk's
+-- alert-timeout minutes; a session past that with arrived_at still NULL is
+-- "overdue" — the trigger for a friend's Check In nudge.
+CREATE TABLE IF NOT EXISTS walk_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    origin TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expected_arrival_at TIMESTAMPTZ NOT NULL,
+    arrived_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS walk_sessions_user_id_started_at_idx ON walk_sessions (user_id, started_at DESC);
+
 -- Seed demo data so the app has something to show right after setup.
 -- Skipped automatically once real rows exist.
 INSERT INTO walks (title, from_location, to_location, time, distance, buddies, night_safe, avatars)

@@ -8,11 +8,13 @@ export function switchTab(tabId) {
     if (target) target.classList.add('active');
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.className = 'nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-neonPink transition';
+        btn.classList.remove('text-neonPink', 'font-extrabold');
+        btn.classList.add('text-slate-400');
     });
 
     const activeBtn = document.getElementById(`nav-${tabId}`);
     if (activeBtn) {
-        activeBtn.className = 'nav-btn flex flex-col items-center gap-1 text-neonPink font-extrabold transition';
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-neonPink', 'font-extrabold');
     }
 }

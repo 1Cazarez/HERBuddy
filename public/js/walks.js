@@ -225,7 +225,8 @@ export async function handleCreateWalk(e) {
         distance: `${distanceMiles} miles`,
         buddies: 3,
         alertMinutes,
-        alertTriggered: false
+        alertTriggered: false,
+        sessionId: null
     };
 
     startRealWalkTracking(originLoc, destLoc);
@@ -245,6 +246,19 @@ export async function handleCreateWalk(e) {
         } catch (err) {
             console.warn('Herbuddy: failed to save walk to the API.', err);
         }
+
+        // A persisted session (separate from the community "walks" list
+        // above) is what lets friends see live walking/overdue status.
+        try {
+            const session = await apiPost('/walk-sessions', {
+                origin: originLoc.name,
+                destination: destLoc.name,
+                alertMinutes
+            });
+            appState.activeWalk.sessionId = session.id;
+        } catch (err) {
+            console.warn('Herbuddy: failed to start a walk session.', err);
+        }
     }
 
     showActiveWalkBanner();
@@ -252,7 +266,7 @@ export async function handleCreateWalk(e) {
     switchTab('find');
 }
 
-export function quickJoinSuggestedRoute() {
+export async function quickJoinSuggestedRoute() {
     const originLoc = gsuLocations.find(l => l.name === "Student Center East");
     const destLoc = gsuLocations.find(l => l.name === "GSU Library");
     appState.activeWalk = {
@@ -263,11 +277,25 @@ export function quickJoinSuggestedRoute() {
         distance: originLoc && destLoc ? `${calcDistanceMiles(originLoc, destLoc)} miles` : "1.2 miles",
         buddies: 3,
         alertMinutes: 30,
-        alertTriggered: false
+        alertTriggered: false,
+        sessionId: null
     };
     if (originLoc && destLoc) startRealWalkTracking(originLoc, destLoc);
     showActiveWalkBanner();
     showToast("Joined Walk Group!", "3 campus buddies notified. Safety check-in initiated.");
+
+    if (backendEnabled) {
+        try {
+            const session = await apiPost('/walk-sessions', {
+                origin: "Student Center East",
+                destination: "GSU Library",
+                alertMinutes: 30
+            });
+            appState.activeWalk.sessionId = session.id;
+        } catch (err) {
+            console.warn('Herbuddy: failed to start a walk session.', err);
+        }
+    }
 }
 
 export function showActiveWalkBanner() {
@@ -322,6 +350,15 @@ export async function triggerArrivalCheckIn() {
             });
         } catch (err) {
             console.warn('Herbuddy: failed to sync arrival stats to the API.', err);
+        }
+
+        const sessionId = appState.activeWalk && appState.activeWalk.sessionId;
+        if (sessionId) {
+            try {
+                await apiPatch(`/walk-sessions/${sessionId}`, { arrived: true });
+            } catch (err) {
+                console.warn('Herbuddy: failed to mark walk session arrived.', err);
+            }
         }
     }
 }

@@ -220,7 +220,10 @@ export function switchToBuddyChat(buddyName) {
     document.getElementById('chat-header-avatar').innerText = buddy.avatar;
     document.getElementById('chat-header-name').innerText = buddy.name;
     document.getElementById('chat-header-status').innerText = 'Active now';
-    document.getElementById('chat-remove-btn').classList.remove('hidden');
+    const removeBtn = document.getElementById('chat-remove-btn');
+    removeBtn.classList.remove('hidden');
+    removeBtn.innerText = 'Remove';
+    removeBtn.onclick = removeCurrentMatchedBuddy;
     document.getElementById('chat-encrypted-badge').classList.add('hidden');
 
     renderConversationList();

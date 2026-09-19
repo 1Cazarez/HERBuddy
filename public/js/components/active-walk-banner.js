@@ -17,6 +17,9 @@ customElements.define('hb-active-walk-banner', class extends HTMLElement {
                         <p class="text-[10px] text-emerald-100"><span id="active-walk-distance">1.2 miles</span> &bull; <span id="active-walk-buddies">2 buddies walking along</span></p>
                     </div>
                     <div class="flex gap-1.5">
+                        <button onclick="openCompanionModal()" class="bg-white/20 text-white text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-white/30 transition active:scale-95 flex items-center gap-1">
+                            <i data-lucide="mic" class="w-3.5 h-3.5"></i> Companion
+                        </button>
                         <button onclick="triggerArrivalCheckIn()" class="bg-white text-emerald-900 text-[11px] font-black px-3 py-1.5 rounded-xl shadow-md hover:bg-emerald-50 transition active:scale-95 flex items-center gap-1">
                             <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600"></i> [ I'VE ARRIVED ]
                         </button>

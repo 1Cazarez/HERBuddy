@@ -19,6 +19,7 @@ import './components/tab-match.js';
 import './components/mutual-match-modal.js';
 import './components/fake-call-modal.js';
 import './components/report-modal.js';
+import './components/companion-modal.js';
 
 import { showToast, hideToast, updateClock } from './utils.js';
 import { switchTab } from './navigation.js';
@@ -64,6 +65,8 @@ import {
 } from './match.js';
 import { openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall } from './fakecall.js';
 import { openReportModal, closeReportModal, submitSafetyReport, renderSafetyReports } from './reports.js';
+import { openCompanionModal, closeCompanionModal, startCompanionCall } from './companion.js';
+import { switchMatchView, addFriendByEmail, removeFriend, checkInOnFriend, openFriendChat } from './friends.js';
 
 Object.assign(window, {
     switchTab,
@@ -82,7 +85,9 @@ Object.assign(window, {
     skipBuddy, resetMatches, connectWithBuddy, closeMutualMatchModal, planWalkWithMatch,
     openChatWithMatchedBuddy, switchToBuddyChat, switchToGroupChat, removeCurrentMatchedBuddy,
     openFakeCallModal, declineFakeCall, answerFakeCall, endFakeCall,
-    openReportModal, closeReportModal, submitSafetyReport
+    openReportModal, closeReportModal, submitSafetyReport,
+    openCompanionModal, closeCompanionModal, startCompanionCall,
+    switchMatchView, addFriendByEmail, removeFriend, checkInOnFriend, openFriendChat
 });
 
 document.addEventListener('DOMContentLoaded', () => {

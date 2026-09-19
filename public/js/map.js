@@ -195,16 +195,33 @@ export function simulateFindMapMove() {
     }, 100);
 }
 
+const darkMapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#1a0533" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#1a0533" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#e0d7ff" }] }
+];
+const lightMapStyles = [
+    { elementType: "geometry", stylers: [{ color: "#f5f0ff" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#ffffff" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#5b2a86" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#e8ddff" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#d6c8ff" }] }
+];
+
+function mapStylesForTheme(themeId) {
+    return themeId === 'bright' ? lightMapStyles : darkMapStyles;
+}
+
+window.addEventListener('herbuddy:theme-changed', (e) => {
+    if (googleMap) googleMap.setOptions({ styles: mapStylesForTheme(e.detail.theme) });
+});
+
 function realInitMap() {
     googleMap = new google.maps.Map(document.getElementById("google-map"), {
         center: GSU_CENTER,
         zoom: 16,
         disableDefaultUI: true,
-        styles: [
-            { elementType: "geometry", stylers: [{ color: "#1a0533" }] },
-            { elementType: "labels.text.stroke", stylers: [{ color: "#1a0533" }] },
-            { elementType: "labels.text.fill", stylers: [{ color: "#e0d7ff" }] }
-        ]
+        styles: mapStylesForTheme(document.documentElement.getAttribute('data-theme'))
     });
 
     gsuLocations.forEach(loc => {

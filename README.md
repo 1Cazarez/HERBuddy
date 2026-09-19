@@ -38,7 +38,7 @@ server/
   auth.js                     # Auth0 access-token verification middleware
   schema.sql                   # tables + demo seed data
   seed.js                        # `npm run seed` runner for schema.sql
-  routes/{me,walks,errands,chat}.js
+  routes/{me,walks,walk-sessions,errands,chat,matches,friends,config}.js
 ```
 
 Each page/tab on the frontend is a custom element (e.g. `<hb-tab-chat>`,
@@ -65,9 +65,9 @@ and `AUTH0_AUDIENCE` committed (these aren't secrets — they're meant to be
 public, client-side values). To run the full app locally against the same
 shared backend the live site uses:
 
-1. **Get two values privately from Juan** (Discord/Slack DM — never put
-   these in a commit or in this file): the TigerData `DATABASE_URL` and the
-   `GOOGLE_MAPS_API_KEY`.
+1. **Get these values privately from Juan** (Discord/Slack DM — never put
+   these in a commit or in this file): the TigerData `DATABASE_URL`, the
+   `GOOGLE_MAPS_API_KEY`, and the two `ELEVENLABS_AGENT_ID_*` values.
    - Heads up: the Maps key is currently restricted (by HTTP referrer, in
      Google Cloud Console) to `https://her-buddy.vercel.app` only, so maps
      will likely stay blank locally unless that gets updated to also allow
@@ -78,6 +78,8 @@ shared backend the live site uses:
    AUTH0_DOMAIN=dev-zkihg5tmwlk8og2v.us.auth0.com
    AUTH0_AUDIENCE=https://herbuddy-api
    GOOGLE_MAPS_API_KEY=<the key Juan sent you>
+   ELEVENLABS_AGENT_ID_FRIEND=<the agent ID Juan sent you>
+   ELEVENLABS_AGENT_ID_GRANDMA=<the agent ID Juan sent you>
    CLIENT_ORIGIN=http://localhost:8934
    ```
    (`AUTH0_DOMAIN`/`AUTH0_AUDIENCE` are just copied from `api-config.js` —
@@ -211,6 +213,30 @@ routes/times — falls back to a straight-line estimate otherwise).
 
 Without this configured, `GET /api/config` returns a null key and the map
 area just stays blank — nothing else breaks.
+
+## Setting up the AI Walking Companion (ElevenLabs)
+
+The "Talk to Walking Companion" feature (Home tab + active-walk banner) is
+a live voice chat, using ElevenLabs' Conversational AI widget, with two
+personas ("Friend" and "Grandma") you can talk to while walking.
+
+1. https://elevenlabs.io → **Conversational AI → Agents** → create an
+   agent for each persona (voice, personality/prompt are up to you)
+2. Copy each agent's **Agent ID** into `server/.env`:
+   ```
+   ELEVENLABS_AGENT_ID_FRIEND=agent_...
+   ELEVENLABS_AGENT_ID_GRANDMA=agent_...
+   ```
+3. Same pattern as the Maps key above: the frontend
+   (`public/js/companion.js`) fetches these from `GET /api/config` at
+   runtime rather than hardcoding them, so they can be rotated without a
+   code change. An agent ID alone doesn't grant API access to your
+   ElevenLabs account, but check the agent's own privacy/access settings
+   in the ElevenLabs dashboard if you want to restrict who can use it.
+
+Without this configured, the companion modal still opens and lets you
+pick a persona, but shows a "not set up yet" message instead of the voice
+widget — nothing else breaks.
 
 ## Deploying
 
